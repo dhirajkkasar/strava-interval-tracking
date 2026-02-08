@@ -95,21 +95,33 @@ const authOptions: NextAuthOptions = {
 
       // Handle OAuth account (this is where Strava tokens come in)
       if (account) {
-        console.log("✅ JWT Callback - OAuth Account received:", {
-          provider: account.provider,
-          hasAccessToken: !!account.access_token,
-          hasRefreshToken: !!account.refresh_token,
-          expiresAt: account.expires_at,
-          accessTokenLength: account.access_token?.length || 0,
+        console.log("✅ JWT Callback - OAuth Account received");
+        console.log("📋 Account object keys:", Object.keys(account));
+        console.log("📋 Full account object:", JSON.stringify(account, null, 2));
+        
+        // Strava might use different property names, check all possibilities
+        const accessToken = account.access_token || account.accessToken || account.token;
+        const refreshToken = account.refresh_token || account.refreshToken;
+        const expiresAt = account.expires_at || account.expiresAt || account.expires_in;
+        
+        console.log("📝 Extracted tokens:", {
+          hasAccessToken: !!accessToken,
+          hasRefreshToken: !!refreshToken,
+          expiresAt: expiresAt,
+          accessTokenLength: accessToken?.length || 0,
         });
         
         // Store the tokens from Strava
-        token.access_token = account.access_token;
-        token.refresh_token = account.refresh_token;
-        token.expires_at = account.expires_at;
+        token.access_token = accessToken;
+        token.refresh_token = refreshToken;
+        token.expires_at = expiresAt;
         token.provider = account.provider;
         
-        console.log("✅ Tokens stored in JWT token");
+        console.log("✅ Tokens stored in JWT token:", {
+          access_token: !!token.access_token,
+          refresh_token: !!token.refresh_token,
+          expires_at: token.expires_at,
+        });
         return token;
       }
 
