@@ -4,16 +4,20 @@ import StravaProvider from "next-auth/providers/strava";
 
 const DEMO_MODE = process.env.DEMO_MODE === "true";
 
+// Trim environment variables to remove any whitespace
+const STRAVA_CLIENT_ID = (process.env.STRAVA_CLIENT_ID || "").trim();
+const STRAVA_CLIENT_SECRET = (process.env.STRAVA_CLIENT_SECRET || "").trim();
+
 // Verify credentials are loaded
 if (!DEMO_MODE) {
-  if (!process.env.STRAVA_CLIENT_ID) {
+  if (!STRAVA_CLIENT_ID) {
     console.warn("⚠️  STRAVA_CLIENT_ID is not set");
   }
-  if (!process.env.STRAVA_CLIENT_SECRET) {
+  if (!STRAVA_CLIENT_SECRET) {
     console.warn("⚠️  STRAVA_CLIENT_SECRET is not set");
   }
   console.log("🔐 Auth Mode: Strava OAuth");
-  console.log(`📋 Client ID: ${process.env.STRAVA_CLIENT_ID?.substring(0, 4)}...`);
+  console.log(`📋 Client ID: ${STRAVA_CLIENT_ID.substring(0, 4)}...`);
 } else {
   console.log("🎭 Auth Mode: Demo Mode");
 }
@@ -42,8 +46,8 @@ const authOptions: NextAuthOptions = {
       ]
     : [
         StravaProvider({
-          clientId: process.env.STRAVA_CLIENT_ID || "",
-          clientSecret: process.env.STRAVA_CLIENT_SECRET || "",
+          clientId: STRAVA_CLIENT_ID,
+          clientSecret: STRAVA_CLIENT_SECRET,
           authorization: {
             params: {
               scope: "activity:read_all",
