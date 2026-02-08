@@ -4,6 +4,20 @@ import StravaProvider from "next-auth/providers/strava";
 
 const DEMO_MODE = process.env.DEMO_MODE === "true";
 
+// Verify credentials are loaded
+if (!DEMO_MODE) {
+  if (!process.env.STRAVA_CLIENT_ID) {
+    console.warn("⚠️  STRAVA_CLIENT_ID is not set");
+  }
+  if (!process.env.STRAVA_CLIENT_SECRET) {
+    console.warn("⚠️  STRAVA_CLIENT_SECRET is not set");
+  }
+  console.log("🔐 Auth Mode: Strava OAuth");
+  console.log(`📋 Client ID: ${process.env.STRAVA_CLIENT_ID?.substring(0, 4)}...`);
+} else {
+  console.log("🎭 Auth Mode: Demo Mode");
+}
+
 const authOptions: NextAuthOptions = {
   providers: DEMO_MODE
     ? [
@@ -37,6 +51,15 @@ const authOptions: NextAuthOptions = {
           },
         }),
       ],
+  
+  // Add debug logging
+  logger: {
+    error: (code, metadata) => {
+      console.error(`[NextAuth][${code}]`, JSON.stringify(metadata, null, 2));
+    },
+    warn: (code) => console.warn(`[NextAuth][${code}]`),
+    debug: (code, metadata) => console.log(`[NextAuth][${code}]`, metadata),
+  },
   pages: {
     signIn: "/login",
   },
@@ -48,6 +71,10 @@ const authOptions: NextAuthOptions = {
     async jwt({ token, account, user }: any) {
       // Handle initial sign-in
       if (user) {
+        console.log("✅ JWT Callback - User signed in:", {
+          userId: user.id,
+          userEmail: user.email,
+        });
         if (DEMO_MODE) {
           token.access_token = "demo-token";
           token.refresh_token = "demo-refresh";
@@ -58,6 +85,12 @@ const authOptions: NextAuthOptions = {
 
       // Handle OAuth account
       if (account) {
+        console.log("✅ JWT Callback - OAuth Account received:", {
+          provider: account.provider,
+          hasAccessToken: !!account.access_token,
+          hasRefreshToken: !!account.refresh_token,
+          expiresAt: account.expires_at,
+        });
         token.access_token = account.access_token;
         token.refresh_token = account.refresh_token;
         token.expires_at = account.expires_at;
@@ -66,6 +99,7 @@ const authOptions: NextAuthOptions = {
 
       // Handle token refresh for OAuth
       if (!DEMO_MODE && token.expires_at && Date.now() >= (token.expires_at as number) * 1000) {
+        console.log("🔄 JWT Callback - Token expired, attempting refresh...");
         try {
           const params = new URLSearchParams();
           params.append("client_id", process.env.STRAVA_CLIENT_ID || "");
@@ -75,13 +109,23 @@ const authOptions: NextAuthOptions = {
 
           const response = await fetch("https://www.strava.com/api/v3/oauth/token", {
             method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
             body: params.toString(),
           });
 
           const refreshed = await response.json();
 
-          if (!response.ok) throw refreshed;
+          if (!response.ok) {
+            console.error("❌ Token refresh failed:", {
+              status: response.status,
+              error: refreshed.error || refreshed,
+            });
+            throw refreshed;
+          }
 
+          console.log("✅ Token refreshed successfully");
           return {
             ...token,
             access_token: refreshed.access_token,
@@ -89,7 +133,7 @@ const authOptions: NextAuthOptions = {
             refresh_token: refreshed.refresh_token ?? token.refresh_token,
           };
         } catch (error) {
-          console.error("Token refresh failed:", error);
+          console.error("❌ Token refresh failed:", error);
           return { ...token, error: "RefreshAccessTokenError" };
         }
       }
@@ -97,10 +141,17 @@ const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }: any) {
+      console.log("📋 Session Callback:", {
+        hasToken: !!token,
+        hasError: !!token.error,
+        hasAccessToken: !!token.access_token,
+      });
       if (token.error) {
+        console.error("❌ Session error - Invalid token:", token.error);
         throw new Error("Session token error");
       }
       session.accessToken = token.access_token as string;
+      console.log("✅ Session created successfully");
       return session;
     },
   },
