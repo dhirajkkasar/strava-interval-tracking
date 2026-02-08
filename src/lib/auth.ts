@@ -69,7 +69,13 @@ const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, account, user }: any) {
-      // Handle initial sign-in
+      console.log("🔵 JWT Callback triggered:", {
+        hasUser: !!user,
+        hasAccount: !!account,
+        hasExistingToken: !!token,
+      });
+
+      // Handle initial sign-in with user
       if (user) {
         console.log("✅ JWT Callback - User signed in:", {
           userId: user.id,
@@ -83,17 +89,23 @@ const authOptions: NextAuthOptions = {
         return token;
       }
 
-      // Handle OAuth account
+      // Handle OAuth account (this is where Strava tokens come in)
       if (account) {
         console.log("✅ JWT Callback - OAuth Account received:", {
           provider: account.provider,
           hasAccessToken: !!account.access_token,
           hasRefreshToken: !!account.refresh_token,
           expiresAt: account.expires_at,
+          accessTokenLength: account.access_token?.length || 0,
         });
+        
+        // Store the tokens from Strava
         token.access_token = account.access_token;
         token.refresh_token = account.refresh_token;
         token.expires_at = account.expires_at;
+        token.provider = account.provider;
+        
+        console.log("✅ Tokens stored in JWT token");
         return token;
       }
 
@@ -102,8 +114,8 @@ const authOptions: NextAuthOptions = {
         console.log("🔄 JWT Callback - Token expired, attempting refresh...");
         try {
           const params = new URLSearchParams();
-          params.append("client_id", process.env.STRAVA_CLIENT_ID || "");
-          params.append("client_secret", process.env.STRAVA_CLIENT_SECRET || "");
+          params.append("client_id", STRAVA_CLIENT_ID);
+          params.append("client_secret", STRAVA_CLIENT_SECRET);
           params.append("refresh_token", (token.refresh_token as string) || "");
           params.append("grant_type", "refresh_token");
 
@@ -138,20 +150,37 @@ const authOptions: NextAuthOptions = {
         }
       }
 
+      // Log token state on every callback
+      console.log("📋 JWT Token state:", {
+        hasAccessToken: !!token.access_token,
+        accessTokenLength: (token.access_token as string)?.length || 0,
+        expiresAt: token.expires_at,
+        hasError: !!token.error,
+      });
+
       return token;
     },
     async session({ session, token }: any) {
-      console.log("📋 Session Callback:", {
+      console.log("📋 Session Callback - Input token:", {
         hasToken: !!token,
         hasError: !!token.error,
         hasAccessToken: !!token.access_token,
+        accessTokenLength: (token.access_token as string)?.length || 0,
+        tokenProvider: token.provider,
       });
+
       if (token.error) {
         console.error("❌ Session error - Invalid token:", token.error);
         throw new Error("Session token error");
       }
+
+      if (!token.access_token) {
+        console.error("❌ Session error - No access token found in token");
+        throw new Error("No access token in session");
+      }
+
       session.accessToken = token.access_token as string;
-      console.log("✅ Session created successfully");
+      console.log("✅ Session created successfully with accessToken");
       return session;
     },
   },

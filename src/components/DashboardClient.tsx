@@ -77,6 +77,12 @@ export default function DashboardClient() {
     setError("");
 
     try {
+      console.log("📤 [DashboardClient] Fetching data:", {
+        startDate,
+        endDate,
+        selectedDistance,
+      });
+
       const response = await fetch("/api/dashboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -87,18 +93,35 @@ export default function DashboardClient() {
         }),
       });
 
+      console.log("📥 [DashboardClient] Response status:", response.status);
+
       if (!response.ok) {
-        throw new Error("Failed to fetch data");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("❌ [DashboardClient] API error response:", {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData.error,
+        });
+        throw new Error(
+          errorData.error || `Failed to fetch data (HTTP ${response.status})`
+        );
       }
 
       const result = await response.json();
+      console.log("✅ [DashboardClient] Data received:", {
+        intervals: result.intervals?.length || 0,
+        dailyAverages: result.dailyAverages?.length || 0,
+      });
       setData(result);
       setIsSynced(true);
 
       // Cache data
       localStorage.setItem("stravaData", JSON.stringify(result));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      console.error("❌ [DashboardClient] Fetch error:", errorMessage);
+      setError(errorMessage);
       setData(null);
     } finally {
       setLoading(false);
