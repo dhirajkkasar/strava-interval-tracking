@@ -72,6 +72,17 @@ const authOptions: NextAuthOptions = {
     maxAge: 604800,
   },
   callbacks: {
+    async signIn({ user, account, profile }: any) {
+      console.log("🔔 NextAuth signIn callback:", {
+        hasUser: !!user,
+        hasAccount: !!account,
+        accountKeys: account ? Object.keys(account) : null,
+        profileSummary: profile ? { id: profile.id, username: profile.username } : null,
+      });
+      // Allow the sign in to proceed
+      return true;
+    },
+
     async jwt({ token, account, user }: any) {
       console.log("🔵 JWT Callback triggered:", {
         hasUser: !!user,
@@ -198,6 +209,15 @@ const authOptions: NextAuthOptions = {
       session.accessToken = token.access_token as string;
       console.log("✅ Session created successfully with accessToken");
       return session;
+    },
+  },
+  events: {
+    async signIn(message) {
+      try {
+        console.log("📣 NextAuth event signIn:", JSON.stringify(message, null, 2));
+      } catch (e) {
+        console.log("📣 NextAuth signIn event (could not stringify)", message);
+      }
     },
   },
 };
