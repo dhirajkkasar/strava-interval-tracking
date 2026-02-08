@@ -75,8 +75,7 @@ export async function POST(request: NextRequest) {
         if (parsed) {
           console.log(`✅ [Dashboard API] Successfully parsed ${activity.id}:`, {
             distance: parsed.distance,
-            sessionDate: parsed.sessionDate,
-            repCount: parsed.repCount,
+            sessionDate: parsed.sessionDate
           });
           if (!distance || parsed.distance === distance) {
             parsedIntervals.push(parsed);

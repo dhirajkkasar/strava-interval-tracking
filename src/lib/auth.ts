@@ -114,8 +114,8 @@ const authOptions: NextAuthOptions = {
         console.log("🔄 JWT Callback - Token expired, attempting refresh...");
         try {
           const params = new URLSearchParams();
-          params.append("client_id", STRAVA_CLIENT_ID);
-          params.append("client_secret", STRAVA_CLIENT_SECRET);
+          params.append("client_id", process.env.STRAVA_CLIENT_ID || "");
+          params.append("client_secret", process.env.STRAVA_CLIENT_SECRET || "");
           params.append("refresh_token", (token.refresh_token as string) || "");
           params.append("grant_type", "refresh_token");
 
