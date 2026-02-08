@@ -1,19 +1,27 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function LoginPage() {
-  const searchParams = useSearchParams();
   const [demoMode, setDemoMode] = useState(false);
   const [loading, setLoading] = useState(false);
-  const error = searchParams.get("error");
+  const [error, setError] = useState<string | null>(null);
 
   // Check if in demo mode
   useEffect(() => {
     const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
     setDemoMode(isDemoMode);
+  }, []);
+
+  // Read `error` query param on the client to avoid Suspense/CSR bailout
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      setError(params.get("error"));
+    } catch (e) {
+      setError(null);
+    }
   }, []);
 
   const handleDemoSignIn = async () => {
