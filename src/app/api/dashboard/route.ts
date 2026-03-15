@@ -17,26 +17,19 @@ function averagePaceStrings(paces: string[]): string {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("🔵 [Dashboard API] Request started");
-    
     const session = await getServerSession(authOptions);
-    console.log("📋 [Dashboard API] Session:", {
-      hasSession: !!session,
-      hasAccessToken: !!session?.accessToken,
-    });
 
     if (!session?.accessToken) {
-      console.error("❌ [Dashboard API] Unauthorized - no access token");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const accessToken = session.accessToken;
+
     const body = await request.json();
     const { startDate, endDate, distance } = body;
-    console.log("📥 [Dashboard API] Request body:", { startDate, endDate, distance });
 
     // Validate inputs
     if (!startDate || !endDate) {
-      console.error("❌ [Dashboard API] Missing dates");
       return NextResponse.json(
         { error: "startDate and endDate are required" },
         { status: 400 }
@@ -44,7 +37,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (distance && !Object.values(INTERVAL_DISTANCES).includes(distance)) {
-      console.error("❌ [Dashboard API] Invalid distance:", distance);
       return NextResponse.json(
         { error: "Invalid distance" },
         { status: 400 }
@@ -54,12 +46,9 @@ export async function POST(request: NextRequest) {
     // Convert dates to Unix timestamps
     const before = Math.floor(new Date(endDate).getTime() / 1000);
     const after = Math.floor(new Date(startDate).getTime() / 1000);
-    console.log("⏰ [Dashboard API] Date range:", { before, after });
 
-    // Fetch activities
-    console.log("🔄 [Dashboard API] Fetching activities from Strava...");
     const activities = await fetchStravaActivities(
-      session.accessToken,
+      accessToken,
       before,
       after
     );
@@ -87,7 +76,7 @@ export async function POST(request: NextRequest) {
       const batch = candidates.slice(i, i + CONCURRENCY);
       const results = await Promise.allSettled(
         batch.map(async (activity: any) => {
-          const detailed = await fetchDetailedActivity(session.accessToken, activity.id);
+          const detailed = await fetchDetailedActivity(accessToken, activity.id);
           return parseIntervalSession(detailed);
         })
       );

@@ -1,13 +1,9 @@
 import { DetailedActivity, ParsedInterval, INTERVAL_DISTANCES, isTimeBasedInterval, getIntervalDurationSeconds } from "../types";
-import { MOCK_ACTIVITIES } from "./mock-data";
-
-
-const DEMO_MODE = process.env.DEMO_MODE === "true";
 
 /**
  * Parse activity name/description for interval patterns like "5x400m", "3x800m", "5x1min", etc.
  */
-function parseDescriptionForIntervals(
+export function parseDescriptionForIntervals(
   name: string | null,
   description: string | null
 ): { distance: number; count: number } | null {
@@ -72,7 +68,7 @@ function parseDescriptionForIntervals(
  * Intervals are distinguished from steady/tempo runs by requiring recovery laps
  * interspersed between work laps — the hallmark of interval training.
  */
-function inferDistanceFromLaps(
+export function inferDistanceFromLaps(
   laps: any[]
 ): { distance: number; count: number } | null {
   if (!laps || laps.length < 3) return null;
@@ -286,16 +282,6 @@ export async function fetchStravaActivities(
   before?: number,
   after?: number
 ): Promise<any[]> {
-  // Use mock data in demo mode
-  if (DEMO_MODE) {
-    return MOCK_ACTIVITIES.filter((activity) => {
-      const activityTime = new Date(activity.start_date).getTime() / 1000;
-      const passBeforeFilter = !before || activityTime < before;
-      const passAfterFilter = !after || activityTime > after;
-      return passBeforeFilter && passAfterFilter;
-    });
-  }
-
   const params = new URLSearchParams();
   if (before) params.append("before", before.toString());
   if (after) params.append("after", after.toString());
@@ -336,15 +322,6 @@ export async function fetchDetailedActivity(
   accessToken: string,
   activityId: number
 ): Promise<DetailedActivity> {
-  // Use mock data in demo mode
-  if (DEMO_MODE) {
-    const mockActivity = MOCK_ACTIVITIES.find((a) => a.id === activityId);
-    if (!mockActivity) {
-      throw new Error(`Activity ${activityId} not found in demo data`);
-    }
-    return mockActivity;
-  }
-
   const response = await fetch(
     `https://www.strava.com/api/v3/activities/${activityId}`,
     {

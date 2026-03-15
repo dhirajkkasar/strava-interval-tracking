@@ -174,6 +174,22 @@ npm start
 
 ## Development
 
+### Run Tests
+
+Run the full test suite before submitting any changes:
+
+```bash
+npm test
+```
+
+Watch mode for development:
+
+```bash
+npm run test:watch
+```
+
+> **Important:** Always run `npm test` before pushing changes to ensure no regressions in interval detection, pace calculation, or dashboard API behavior.
+
 ### Build for Production
 
 ```bash
