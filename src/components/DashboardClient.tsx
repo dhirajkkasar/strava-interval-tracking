@@ -89,7 +89,6 @@ export default function DashboardClient() {
         body: JSON.stringify({
           startDate,
           endDate,
-          distance: selectedDistance,
         }),
       });
 
@@ -249,11 +248,17 @@ export default function DashboardClient() {
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
-                  <YAxis label={{ value: "Time (seconds)", angle: -90, position: "insideLeft" }} />
+                  <YAxis yAxisId="left" label={{ value: "Time (seconds)", angle: -90, position: "insideLeft" }} />
+                  <YAxis yAxisId="right" orientation="right" label={{ value: "Pace (min/km)", angle: 90, position: "insideRight" }} />
                   <Tooltip 
                     formatter={(value: unknown, name?: string): string => {
                       const val = value as number;
-                      if (name === "time") return `${val} sec`;
+                      if (name === "Avg Time (sec)") return `${val} sec`;
+                      if (name === "Pace (min/km)") {
+                        const mins = Math.floor(val / 60);
+                        const secs = Math.round(val % 60);
+                        return `${mins}:${secs.toString().padStart(2, "0")}`;
+                      }
                       return String(value);
                     }}
                   />
@@ -262,7 +267,16 @@ export default function DashboardClient() {
                     type="monotone"
                     dataKey="time"
                     stroke="#3b82f6"
+                    yAxisId="left"
                     name="Avg Time (sec)"
+                    connectNulls
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="pace"
+                    stroke="#ef4444"
+                    yAxisId="right"
+                    name="Pace (min/km)"
                     connectNulls
                   />
                 </LineChart>
@@ -319,10 +333,4 @@ export default function DashboardClient() {
 function timeStringToSeconds(timeStr: string): number {
   const parts = timeStr.split(":").map(Number);
   return parts[0] * 60 + parts[1];
-}
-
-function secondsToTimeString(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.round(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
 }

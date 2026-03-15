@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
-import { fetchStravaActivities, fetchDetailedActivity, parseIntervalSession } from "../../../lib/strava";
+import { fetchStravaActivities, fetchDetailedActivity, parseIntervalSession, calculatePace } from "../../../lib/strava";
 import { ParsedInterval, IntervalDay, INTERVAL_DISTANCES } from "../../../types";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -62,32 +62,25 @@ export async function POST(request: NextRequest) {
     });
     console.log("🎯 [Dashboard API] Found", intervalActivities.length, "interval activities");
 
-    // Parse intervals from activities
+    // Parse intervals from activities - fetch details in parallel (5 at a time)
+    const CONCURRENCY = 5;
     const parsedIntervals: ParsedInterval[] = [];
 
-    for (const activity of intervalActivities) {
-      try {
-        console.log(`📊 [Dashboard API] Parsing activity ${activity.id}: ${activity.name}`);
-        // Fetch detailed activity with laps
-        const detailed = await fetchDetailedActivity(session.accessToken, activity.id);
-        const parsed = parseIntervalSession(detailed);
+    for (let i = 0; i < intervalActivities.length; i += CONCURRENCY) {
+      const batch = intervalActivities.slice(i, i + CONCURRENCY);
+      const results = await Promise.allSettled(
+        batch.map(async (activity: any) => {
+          const detailed = await fetchDetailedActivity(session.accessToken, activity.id);
+          return parseIntervalSession(detailed);
+        })
+      );
 
-        if (parsed) {
-          console.log(`✅ [Dashboard API] Successfully parsed ${activity.id}:`, {
-            distance: parsed.distance,
-            sessionDate: parsed.sessionDate
-          });
-          if (!distance || parsed.distance === distance) {
-            parsedIntervals.push(parsed);
-          } else {
-            console.log(`⏭️  [Dashboard API] Skipped ${activity.id} - distance mismatch`);
+      for (const result of results) {
+        if (result.status === "fulfilled" && result.value) {
+          if (!distance || result.value.distance === distance) {
+            parsedIntervals.push(result.value);
           }
-        } else {
-          console.warn(`⚠️  [Dashboard API] Could not parse activity ${activity.id}`);
         }
-      } catch (error) {
-        console.error(`❌ [Dashboard API] Failed to parse activity ${activity.id}:`, error);
-        continue;
       }
     }
     console.log("📈 [Dashboard API] Total parsed intervals:", parsedIntervals.length);
@@ -133,16 +126,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-function calculatePace(distance: number, timeSeconds: number): string {
-  if (distance === 0) return "N/A";
-  const kmDistance = distance / 1000;
-  const totalMinutes = timeSeconds / 60;
-  const paceMinutes = totalMinutes / kmDistance;
-
-  const minutes = Math.floor(paceMinutes);
-  const seconds = Math.round((paceMinutes - minutes) * 60);
-
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }

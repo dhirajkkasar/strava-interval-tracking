@@ -14,8 +14,7 @@ function parseDescriptionForIntervals(
 
   // Look for patterns like "5x400m", "3x800m", etc.
   const patterns = [
-    /(\d+)\s*x\s*(\d+)m/gi, // 5x400m, 3x800m
-    /(\d+)\s*x\s*(\d+)(?:m|meter)/gi, // 5x400 meter
+    /(\d+)\s*x\s*(\d+)\s*(?:m|meter)/gi, // 5x400m, 3x800m, 5x400 meter
     /(\d+)\s*repeat\s*(?:of\s+)?(\d+)m/gi, // 5 repeat of 400m
   ];
 
@@ -45,42 +44,32 @@ function inferDistanceFromLaps(
 ): { distance: number; count: number } | null {
   if (!laps || laps.length < 2) return null;
 
-  // Calculate lap distances
   const lapDistances = laps.map((lap) => lap.distance);
-  const uniqueDistances = [...new Set(lapDistances)];
-
-  // Find the most common lap distance (likely the interval)
-  const distanceFreq: { [key: number]: number } = {};
-  lapDistances.forEach((dist) => {
-    distanceFreq[dist] = (distanceFreq[dist] || 0) + 1;
-  });
-
-  const mostCommonDistance = Object.entries(distanceFreq).sort(
-    (a, b) => b[1] - a[1]
-  )[0]?.[0];
-
-  if (!mostCommonDistance) return null;
-
-  const distance = parseInt(mostCommonDistance);
   const validDistances = Object.values(INTERVAL_DISTANCES);
 
-  // Check if this distance is close to one of our target distances
-  const closestValid = validDistances.find(
-    (d) => Math.abs(d - distance) < d * 0.15 // Allow 15% variance
-  );
-
-  if (closestValid) {
-    const intervalLaps = lapDistances.filter((d) => Math.abs(d - distance) < distance * 0.15);
-    return { distance: closestValid, count: intervalLaps.length };
+  // Bucket each lap into the nearest valid distance (within 15% tolerance)
+  const bucketFreq: { [key: number]: number } = {};
+  for (const dist of lapDistances) {
+    const match = validDistances.find((d) => Math.abs(d - dist) < d * 0.15);
+    if (match) {
+      bucketFreq[match] = (bucketFreq[match] || 0) + 1;
+    }
   }
 
-  return null;
+  // Find the most frequent bucket with at least 2 laps
+  const best = Object.entries(bucketFreq)
+    .filter(([, count]) => count >= 2)
+    .sort((a, b) => b[1] - a[1])[0];
+
+  if (!best) return null;
+
+  return { distance: Number(best[0]), count: best[1] };
 }
 
 /**
  * Calculate average pace in min/km
  */
-function calculatePace(distance: number, timeSeconds: number): string {
+export function calculatePace(distance: number, timeSeconds: number): string {
   if (distance === 0) return "N/A";
   const kmDistance = distance / 1000;
   const totalMinutes = timeSeconds / 60;
@@ -182,20 +171,32 @@ export async function fetchStravaActivities(
   if (after) params.append("after", after.toString());
   params.append("per_page", "200");
 
-  const response = await fetch(
-    `https://www.strava.com/api/v3/athlete/activities?${params.toString()}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
+  const allActivities: any[] = [];
+  let page = 1;
 
-  if (!response.ok) {
-    throw new Error(`Strava API error: ${response.statusText}`);
+  while (true) {
+    params.set("page", page.toString());
+    const response = await fetch(
+      `https://www.strava.com/api/v3/athlete/activities?${params.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Strava API error: ${response.statusText}`);
+    }
+
+    const batch: any[] = await response.json();
+    allActivities.push(...batch);
+
+    if (batch.length < 200) break;
+    page++;
   }
 
-  return response.json();
+  return allActivities;
 }
 
 /**
