@@ -83,8 +83,11 @@ export async function POST(request: NextRequest) {
 
       for (const result of results) {
         if (result.status === "fulfilled" && result.value) {
-          if (!distance || result.value.distance === distance) {
-            parsedIntervals.push(result.value);
+          const intervals = Array.isArray(result.value) ? result.value : [result.value];
+          for (const interval of intervals) {
+            if (!distance || interval.distance === distance) {
+              parsedIntervals.push(interval);
+            }
           }
         }
       }

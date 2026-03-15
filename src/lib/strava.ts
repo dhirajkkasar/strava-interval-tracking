@@ -3,13 +3,19 @@ import { DetailedActivity, ParsedInterval, INTERVAL_DISTANCES, isTimeBasedInterv
 /**
  * Parse activity name/description for interval patterns like "5x400m", "3x800m", "5x1min", etc.
  */
+type DetectedInterval = { distance: number; count: number };
+
 export function parseDescriptionForIntervals(
   name: string | null,
   description: string | null
-): { distance: number; count: number } | null {
+): DetectedInterval | DetectedInterval[] | null {
   // Check both name and description
   const texts = [name, description].filter(Boolean) as string[];
   if (texts.length === 0) return null;
+
+  const allTexts = texts.join(" ");
+  const isLadderKeyword = /ladder|pyramid/i.test(allTexts);
+  const validDistances = Object.values(INTERVAL_DISTANCES);
 
   for (const text of texts) {
     // Time-based: "5x1min", "5 x 2 min", "5×1min"
@@ -24,8 +30,7 @@ export function parseDescriptionForIntervals(
         const count = parseInt(match[1]);
         const minutes = parseInt(match[2]);
         const intervalValue = -(minutes * 60);
-        const validValues = Object.values(INTERVAL_DISTANCES);
-        if (validValues.includes(intervalValue as typeof validValues[number])) {
+        if (validDistances.includes(intervalValue as typeof validDistances[number])) {
           return { distance: intervalValue, count };
         }
       }
@@ -52,9 +57,47 @@ export function parseDescriptionForIntervals(
           distance = parseInt(match[2]);
         }
 
-        const validDistances = Object.values(INTERVAL_DISTANCES);
         if (validDistances.includes(distance as typeof validDistances[number])) {
           return { distance, count };
+        }
+      }
+    }
+
+    // Ladder: "200-400-800m", "200, 400, 800m", "200/400/800m"
+    // Requires "ladder"/"pyramid" keyword OR the sequence itself ends with m
+    const ladderMatch = text.match(/(\d+(?:\s*[-,/]\s*\d+)+)\s*m\b/i);
+    if (ladderMatch) {
+      const nums = ladderMatch[1].split(/\s*[-,/]\s*/).map(Number);
+      if (nums.length >= 2) {
+        // Every distance must be a valid interval distance
+        const allValid = nums.every(d =>
+          validDistances.includes(d as typeof validDistances[number])
+        );
+        // Must be ascending or descending (not all same — that's NxDm territory)
+        const isAscending = nums.every((d, i) => i === 0 || d >= nums[i - 1]);
+        const isDescending = nums.every((d, i) => i === 0 || d <= nums[i - 1]);
+        const allSame = nums.every(d => d === nums[0]);
+        if (allValid && !allSame && (isAscending || isDescending || isLadderKeyword)) {
+          return nums.map(d => ({ distance: d, count: 1 }));
+        }
+      }
+    }
+  }
+
+  // Check if "ladder" keyword present but distances are in the other text field
+  if (isLadderKeyword) {
+    for (const text of texts) {
+      const commaMatch = text.match(/(\d+(?:\s*,\s*\d+)+)\s*m?\b/i);
+      if (commaMatch) {
+        const nums = commaMatch[1].split(/\s*,\s*/).map(Number);
+        if (nums.length >= 2) {
+          const allValid = nums.every(d =>
+            validDistances.includes(d as typeof validDistances[number])
+          );
+          const allSame = nums.every(d => d === nums[0]);
+          if (allValid && !allSame) {
+            return nums.map(d => ({ distance: d, count: 1 }));
+          }
         }
       }
     }
@@ -70,7 +113,7 @@ export function parseDescriptionForIntervals(
  */
 export function inferDistanceFromLaps(
   laps: any[]
-): { distance: number; count: number } | null {
+): DetectedInterval | DetectedInterval[] | null {
   if (!laps || laps.length < 3) return null;
 
   const validValues = Object.values(INTERVAL_DISTANCES);
@@ -116,7 +159,19 @@ export function inferDistanceFromLaps(
     const avgRestPace =
       restIndices.reduce((s: number, i: number) => s + paces[i], 0) / restIndices.length;
 
-    return avgWorkPace < avgRestPace * 0.8;
+    if (avgWorkPace >= avgRestPace * 0.8) return false;
+
+    // Reject tempo/steady-state runs: if all rest laps are only at the
+    // edges (before first work lap or after last), the work laps form one
+    // continuous block — that's a tempo run, not intervals.
+    const firstWork = workIndices[0];
+    const lastWork = workIndices[workIndices.length - 1];
+    const hasRestBetweenWork = restIndices.some(
+      (i: number) => i > firstWork && i < lastWork
+    );
+    if (!hasRestBetweenWork) return false;
+
+    return true;
   }
 
   // --- Time-based matching ---
@@ -175,6 +230,30 @@ export function inferDistanceFromLaps(
     return { distance: Number(dist), count: indices.size };
   }
 
+  // --- Ladder detection ---
+  // Identify fast (work) laps by pace, then check if they form an
+  // ascending or descending sequence of different valid distances.
+  const avgPace = paces.reduce((s, p) => s + p, 0) / paces.length;
+  const fastLaps: { index: number; distance: number }[] = [];
+  laps.forEach((lap: any, i: number) => {
+    if (paces[i] > avgPace) return; // skip slow laps
+    const match = validValues.find((d) => d > 0 && Math.abs(d - lap.distance) < d * 0.15);
+    if (match) fastLaps.push({ index: i, distance: match });
+  });
+
+  if (fastLaps.length >= 2) {
+    const uniqueDists = new Set(fastLaps.map(m => m.distance));
+    if (uniqueDists.size >= 2) {
+      const distances = fastLaps.map(m => m.distance);
+      const isAscending = distances.every((d, i) => i === 0 || d >= distances[i - 1]);
+      const isDescending = distances.every((d, i) => i === 0 || d <= distances[i - 1]);
+
+      if (isAscending || isDescending) {
+        return fastLaps.map(m => ({ distance: m.distance, count: 1 }));
+      }
+    }
+  }
+
   return null;
 }
 
@@ -199,13 +278,13 @@ export function calculatePace(distance: number, timeSeconds: number): string {
  */
 export function parseIntervalSession(
   activity: DetailedActivity
-): ParsedInterval | null {
+): ParsedInterval | ParsedInterval[] | null {
   const { id, name, description, start_date, start_date_local } = activity;
 
   // Need at least 2 laps for interval detection
   if (!activity.laps || activity.laps.length < 2) return null;
 
-  let detected: { distance: number; count: number } | null = null;
+  let detected: DetectedInterval | DetectedInterval[] | null = null;
   let detected_by: "description" | "lap" | "segment" | "unknown" = "unknown";
 
   // Try to parse from name/description first
@@ -222,10 +301,31 @@ export function parseIntervalSession(
     }
   }
 
-  // If no detection, return null
   if (!detected) return null;
 
-  // Calculate average time for the interval distance
+  const sessionDate = (start_date_local || start_date).split("T")[0];
+
+  // Ladder: return one ParsedInterval per distance
+  if (Array.isArray(detected)) {
+    return detected.map(d => {
+      // Find the best matching lap for this distance
+      const matchingLap = activity.laps!.find(
+        lap => Math.abs(lap.distance - d.distance) < d.distance * 0.15
+      );
+      const time = matchingLap ? matchingLap.elapsed_time : 0;
+      return {
+        sessionId: id,
+        sessionDate,
+        activityName: name,
+        distance: d.distance,
+        avgTime: Math.round(time),
+        avgPace: calculatePace(d.distance, time),
+        detected_by,
+      };
+    });
+  }
+
+  // Single distance: existing logic
   let totalIntervalTime = 0;
   let intervalCount = 0;
   let totalIntervalDistance = 0;

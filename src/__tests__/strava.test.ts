@@ -190,3 +190,155 @@ describe("parseIntervalSession", () => {
     expect(result).toBeNull();
   });
 });
+
+// --- Ladder interval detection ---
+
+describe("parseDescriptionForIntervals - ladder patterns", () => {
+  it("parses '200-400-800m' ascending ladder", () => {
+    const result = parseDescriptionForIntervals("200-400-800m ladder", null);
+    expect(result).toEqual([
+      { distance: 200, count: 1 },
+      { distance: 400, count: 1 },
+      { distance: 800, count: 1 },
+    ]);
+  });
+
+  it("parses '800-400-200m' descending ladder", () => {
+    const result = parseDescriptionForIntervals("800-400-200m", null);
+    expect(result).toEqual([
+      { distance: 800, count: 1 },
+      { distance: 400, count: 1 },
+      { distance: 200, count: 1 },
+    ]);
+  });
+
+  it("parses ladder from description when name has no pattern", () => {
+    const result = parseDescriptionForIntervals("Track session", "200-400-800-400-200m pyramid");
+    expect(result).toEqual([
+      { distance: 200, count: 1 },
+      { distance: 400, count: 1 },
+      { distance: 800, count: 1 },
+      { distance: 400, count: 1 },
+      { distance: 200, count: 1 },
+    ]);
+  });
+
+  it("detects ladder when 'ladder' keyword is in name", () => {
+    const result = parseDescriptionForIntervals("Ladder workout", "200, 400, 800, 1200m");
+    expect(result).toEqual([
+      { distance: 200, count: 1 },
+      { distance: 400, count: 1 },
+      { distance: 800, count: 1 },
+      { distance: 1200, count: 1 },
+    ]);
+  });
+
+  it("ignores ladder-like sequences with unsupported distances", () => {
+    // 300m is not a valid interval distance
+    expect(parseDescriptionForIntervals("300-600-900m", null)).toBeNull();
+  });
+
+  it("does not treat '5x400m' as a ladder", () => {
+    const result = parseDescriptionForIntervals("5x400m intervals", null);
+    expect(result).toEqual({ distance: 400, count: 5 });
+  });
+});
+
+describe("inferDistanceFromLaps - ladder patterns", () => {
+  it("detects ascending ladder 200-400-800 with recovery laps", () => {
+    const laps = [
+      { distance: 200, elapsed_time: 38 },   // work
+      { distance: 200, elapsed_time: 120 },   // recovery (slow)
+      { distance: 400, elapsed_time: 80 },    // work
+      { distance: 200, elapsed_time: 120 },   // recovery
+      { distance: 800, elapsed_time: 170 },   // work
+    ];
+    const result = inferDistanceFromLaps(laps);
+    expect(result).toEqual([
+      { distance: 200, count: 1 },
+      { distance: 400, count: 1 },
+      { distance: 800, count: 1 },
+    ]);
+  });
+
+  it("detects descending ladder 800-400-200 with recovery laps", () => {
+    const laps = [
+      { distance: 800, elapsed_time: 170 },
+      { distance: 200, elapsed_time: 120 },
+      { distance: 400, elapsed_time: 80 },
+      { distance: 200, elapsed_time: 120 },
+      { distance: 200, elapsed_time: 38 },
+    ];
+    const result = inferDistanceFromLaps(laps);
+    expect(result).toEqual([
+      { distance: 800, count: 1 },
+      { distance: 400, count: 1 },
+      { distance: 200, count: 1 },
+    ]);
+  });
+
+  it("does not detect ladder from steady tempo laps", () => {
+    const laps = [
+      { distance: 1000, elapsed_time: 270 },
+      { distance: 1000, elapsed_time: 265 },
+      { distance: 1000, elapsed_time: 260 },
+      { distance: 1000, elapsed_time: 255 },
+    ];
+    expect(inferDistanceFromLaps(laps)).toBeNull();
+  });
+
+  it("still detects normal same-distance intervals (not ladder)", () => {
+    const laps = [
+      { distance: 400, elapsed_time: 85 },
+      { distance: 200, elapsed_time: 120 },
+      { distance: 400, elapsed_time: 87 },
+      { distance: 200, elapsed_time: 115 },
+      { distance: 400, elapsed_time: 84 },
+    ];
+    expect(inferDistanceFromLaps(laps)).toEqual({ distance: 400, count: 3 });
+  });
+});
+
+describe("parseIntervalSession - ladder workouts", () => {
+  it("returns array of ParsedIntervals for ladder described in name", () => {
+    const activity: DetailedActivity = {
+      id: 100,
+      name: "200-400-800m ladder",
+      description: null,
+      distance: 2000,
+      moving_time: 600,
+      elapsed_time: 900,
+      start_date: "2024-07-01T10:00:00Z",
+      type: "Run",
+      sport_type: "Run",
+      laps: [
+        { id: 1, name: "Lap 1", elapsed_time: 38, distance: 200, moving_time: 36, start_index: 0, end_index: 1, lap_index: 1 },
+        { id: 2, name: "Lap 2", elapsed_time: 120, distance: 200, moving_time: 115, start_index: 1, end_index: 2, lap_index: 2 },
+        { id: 3, name: "Lap 3", elapsed_time: 80, distance: 400, moving_time: 78, start_index: 2, end_index: 3, lap_index: 3 },
+        { id: 4, name: "Lap 4", elapsed_time: 120, distance: 200, moving_time: 115, start_index: 3, end_index: 4, lap_index: 4 },
+        { id: 5, name: "Lap 5", elapsed_time: 170, distance: 800, moving_time: 165, start_index: 4, end_index: 5, lap_index: 5 },
+      ],
+    };
+    const result = parseIntervalSession(activity);
+    expect(Array.isArray(result)).toBe(true);
+    const arr = result as ParsedInterval[];
+    expect(arr).toHaveLength(3);
+    expect(arr[0].distance).toBe(200);
+    expect(arr[0].avgTime).toBe(38);
+    expect(arr[0].detected_by).toBe("description");
+    expect(arr[1].distance).toBe(400);
+    expect(arr[1].avgTime).toBe(80);
+    expect(arr[2].distance).toBe(800);
+    expect(arr[2].avgTime).toBe(170);
+    // All share same session metadata
+    expect(arr.every(i => i.sessionId === 100)).toBe(true);
+    expect(arr.every(i => i.sessionDate === "2024-07-01")).toBe(true);
+  });
+
+  it("still returns single ParsedInterval for normal same-distance intervals", () => {
+    const result = parseIntervalSession(makeActivity());
+    expect(result).not.toBeNull();
+    expect(Array.isArray(result)).toBe(false);
+    expect((result as ParsedInterval).distance).toBe(400);
+  });
+});
