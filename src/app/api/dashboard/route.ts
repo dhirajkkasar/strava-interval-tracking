@@ -1,8 +1,19 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
 import { fetchStravaActivities, fetchDetailedActivity, parseIntervalSession, calculatePace } from "../../../lib/strava";
-import { ParsedInterval, IntervalDay, INTERVAL_DISTANCES } from "../../../types";
+import { ParsedInterval, IntervalDay, INTERVAL_DISTANCES, isTimeBasedInterval } from "../../../types";
 import { NextRequest, NextResponse } from "next/server";
+
+function averagePaceStrings(paces: string[]): string {
+  const totalSeconds = paces.reduce((sum, p) => {
+    const [m, s] = p.split(":").map(Number);
+    return sum + m * 60 + s;
+  }, 0);
+  const avg = totalSeconds / paces.length;
+  const mins = Math.floor(avg / 60);
+  const secs = Math.round(avg % 60);
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,20 +65,26 @@ export async function POST(request: NextRequest) {
     );
     console.log("✅ [Dashboard API] Fetched", activities.length, "activities");
 
-    // Filter for interval activities
-    const intervalActivities = activities.filter((activity: any) => {
-      const name = activity.name?.toLowerCase() || "";
-      const description = activity.description?.toLowerCase() || "";
-      return name.includes("interval") || description.includes("interval");
+    // Pre-filter: only fetch details for activities likely to be intervals
+    // - workout_type 3 = "Workout" in Strava (includes intervals)
+    // - name/description contains interval patterns (5x400m, 5x1min, etc.)
+    // - name/description contains common interval keywords
+    const intervalKeywords = /interval|repeat|rep|fartlek|speed\s*work|track/i;
+    const intervalPattern = /\d+\s*[x×]\s*\d+\s*(?:m|meter|min|k\b)/i;
+
+    const candidates = activities.filter((activity: any) => {
+      if (activity.workout_type === 3) return true;
+      const text = `${activity.name || ""} ${activity.description || ""}`;
+      return intervalKeywords.test(text) || intervalPattern.test(text);
     });
-    console.log("🎯 [Dashboard API] Found", intervalActivities.length, "interval activities");
+    console.log("🎯 [Dashboard API] Filtered to", candidates.length, "candidates from", activities.length, "activities");
 
     // Parse intervals from activities - fetch details in parallel (5 at a time)
     const CONCURRENCY = 5;
     const parsedIntervals: ParsedInterval[] = [];
 
-    for (let i = 0; i < intervalActivities.length; i += CONCURRENCY) {
-      const batch = intervalActivities.slice(i, i + CONCURRENCY);
+    for (let i = 0; i < candidates.length; i += CONCURRENCY) {
+      const batch = candidates.slice(i, i + CONCURRENCY);
       const results = await Promise.allSettled(
         batch.map(async (activity: any) => {
           const detailed = await fetchDetailedActivity(session.accessToken, activity.id);
@@ -98,13 +115,21 @@ export async function POST(request: NextRequest) {
     const dailyAverages: IntervalDay[] = Object.entries(dailyMap).map(([date, intervals]) => {
       const avgTime = Math.round(intervals.reduce((sum, i) => sum + i.avgTime, 0) / intervals.length);
       const distanceVal = intervals[0].distance;
-      const avgPace = calculatePace(distanceVal, avgTime);
+      // For time-based intervals, average the per-session paces since distance varies
+      const avgPace = isTimeBasedInterval(distanceVal)
+        ? averagePaceStrings(intervals.map((i) => i.avgPace))
+        : calculatePace(distanceVal, avgTime);
 
       return {
         date,
         distance: distanceVal,
         avgTime,
         avgPace,
+        ...(isTimeBasedInterval(distanceVal) && {
+          avgDistance: Math.round(
+            intervals.reduce((s, i) => s + (i.avgCoveredDistance || 0), 0) / intervals.length
+          ),
+        }),
         sessions: intervals,
       };
     });

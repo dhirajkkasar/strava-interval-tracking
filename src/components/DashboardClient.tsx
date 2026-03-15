@@ -11,7 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { ParsedInterval, IntervalDay, INTERVAL_DISTANCES } from "../types";
+import { ParsedInterval, IntervalDay, INTERVAL_DISTANCES, isTimeBasedInterval } from "../types";
 
 interface DashboardData {
   distance: number | null;
@@ -127,6 +127,11 @@ export default function DashboardClient() {
     }
   };
 
+  // Get display label for selected interval
+  const selectedLabel = Object.entries(INTERVAL_DISTANCES).find(
+    ([, v]) => v === selectedDistance
+  )?.[0] ?? `${selectedDistance}m`;
+
   // Filter data based on selected distance
   const filteredData = data
     ? {
@@ -233,7 +238,7 @@ export default function DashboardClient() {
             <p className="text-gray-600 text-lg">No data found</p>
             {isSynced && (
               <p className="text-gray-500 text-sm mt-2">
-                No interval sessions found for {selectedDistance}m in this date range
+                No interval sessions found for {selectedLabel} in this date range
               </p>
             )}
           </div>
@@ -286,7 +291,7 @@ export default function DashboardClient() {
             {/* Daily Averages Table */}
             <div className="bg-white rounded-lg shadow-lg p-6">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                Daily Averages - {selectedDistance}m
+                Daily Averages - {selectedLabel}
               </h2>
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -298,6 +303,11 @@ export default function DashboardClient() {
                       <th className="px-4 py-3 text-left font-semibold text-gray-700">
                         Sessions
                       </th>
+                      {isTimeBasedInterval(selectedDistance) && (
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                          Avg Distance
+                        </th>
+                      )}
                       <th className="px-4 py-3 text-left font-semibold text-gray-700">
                         Avg Time
                       </th>
@@ -314,6 +324,9 @@ export default function DashboardClient() {
                       >
                         <td className="px-4 py-3 text-gray-800">{day.date}</td>
                         <td className="px-4 py-3 text-gray-800">{day.sessions.length}</td>
+                        {isTimeBasedInterval(selectedDistance) && (
+                          <td className="px-4 py-3 text-gray-800">{day.avgDistance}m</td>
+                        )}
                         <td className="px-4 py-3 text-gray-800">{day.avgTime}s</td>
                         <td className="px-4 py-3 text-gray-800">{day.avgPace}</td>
                       </tr>
