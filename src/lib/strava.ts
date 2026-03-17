@@ -37,22 +37,31 @@ export function parseDescriptionForIntervals(
     }
 
     // Distance-based: "5x400m", "5 x 400m", "5×400m", "5*400m", "400m x 5", "5 repeat of 400m"
+    // Also handles grouped sets like "12 *(400m fast + 200m recovery)" where ( follows the separator.
     const distPatterns: Array<{ regex: RegExp; reversed: boolean }> = [
-      { regex: /(\d+)\s*[x×*]\s*(\d+)\s*(?:m|meter)/gi, reversed: false },  // 5x400m
-      { regex: /(\d+)\s*(?:m|meter)\s*[x×*]\s*(\d+)/gi, reversed: true },   // 400m x 5
-      { regex: /(\d+)\s*repeat\s*(?:of\s+)?(\d+)\s*m/gi, reversed: false }, // 5 repeat of 400m
+      { regex: /(\d+)\s*[x×*]\s*\(?\s*(\d+)\s*(?:m|meter)/gi, reversed: false },  // 5x400m, 12*(400m
+      { regex: /(\d+)\s*(?:m|meter)\s*[x×*]\s*(\d+)/gi, reversed: true },          // 400m x 5
+      { regex: /(\d+)\s*repeat\s*(?:of\s+)?(\d+)\s*m/gi, reversed: false },        // 5 repeat of 400m
     ];
 
+    // Collect ALL valid matches across the whole text, then prefer the one
+    // with the highest count. This handles descriptions like:
+    // "4 * 100m strides + 12 *(400m fast + 200m recovery)" — 12 > 4 so 400m wins.
+    const allDistMatches: Array<{ distance: number; count: number }> = [];
     for (const { regex, reversed } of distPatterns) {
       regex.lastIndex = 0;
-      const match = regex.exec(text);
-      if (match) {
+      let match;
+      while ((match = regex.exec(text)) !== null) {
         const count    = reversed ? parseInt(match[2]) : parseInt(match[1]);
         const distance = reversed ? parseInt(match[1]) : parseInt(match[2]);
         if (validDistances.includes(distance as typeof validDistances[number])) {
-          return { distance, count };
+          allDistMatches.push({ distance, count });
         }
       }
+    }
+    if (allDistMatches.length > 0) {
+      allDistMatches.sort((a, b) => b.count - a.count);
+      return allDistMatches[0];
     }
 
     // Ladder: "200-400-800m", "200, 400, 800m", "200/400/800m"

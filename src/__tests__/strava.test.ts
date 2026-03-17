@@ -44,6 +44,22 @@ describe("parseDescriptionForIntervals", () => {
   it("prefers name match over description", () => {
     expect(parseDescriptionForIntervals("5x400m", "3x800m")).toEqual({ distance: 400, count: 5 });
   });
+
+  it("parses asterisk separator", () => {
+    expect(parseDescriptionForIntervals("5*400m", null)).toEqual({ distance: 400, count: 5 });
+  });
+
+  it("handles grouped set notation like '12 *(400m fast + 200m recovery)'", () => {
+    // The '(' after '*' used to break the regex match
+    const desc = "2k warmup + 4 * 100m strides + 12 *(400m fast + 200m recovery) + 0.5k cooldown";
+    expect(parseDescriptionForIntervals("Intervals", desc)).toEqual({ distance: 400, count: 12 });
+  });
+
+  it("picks highest-count match when description has multiple NxDm patterns", () => {
+    // 4 * 100m strides should lose to 12 * 400m
+    const desc = "4 * 100m strides + 12 * 400m";
+    expect(parseDescriptionForIntervals("Workout", desc)).toEqual({ distance: 400, count: 12 });
+  });
 });
 
 // --- inferDistanceFromLaps ---
