@@ -333,6 +333,14 @@ export function parseIntervalSession(
     }
   }
 
+  // For tempo runs, only 100m strides are valid lap-inferred intervals.
+  // The tempo-paced km laps must not be reported as interval work.
+  // Description-detected intervals (e.g. "Tempo + 5x400m") are still kept.
+  if (detected && detected_by === "lap" && /tempo/i.test(name ?? "")) {
+    const is100m = !Array.isArray(detected) && detected.distance === 100;
+    if (!is100m) detected = null;
+  }
+
   if (!detected) return null;
 
   const sessionDate = (start_date_local || start_date).split("T")[0];

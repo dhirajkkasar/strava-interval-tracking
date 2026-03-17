@@ -270,6 +270,68 @@ describe("parseDescriptionForIntervals - asterisk and reversed patterns", () => 
 
 // --- 100m stride detection ---
 
+describe("parseIntervalSession - tempo run filtering", () => {
+  function makeTempoActivity(name: string, laps: Array<{ distance: number; elapsed_time: number }>): DetailedActivity {
+    return {
+      id: 99,
+      name,
+      description: null,
+      distance: laps.reduce((s, l) => s + l.distance, 0),
+      moving_time: laps.reduce((s, l) => s + l.elapsed_time, 0),
+      elapsed_time: laps.reduce((s, l) => s + l.elapsed_time, 0),
+      start_date: "2024-06-01T08:00:00Z",
+      type: "Run",
+      sport_type: "Run",
+      laps: laps.map((l, i) => ({
+        id: i,
+        name: `Lap ${i + 1}`,
+        elapsed_time: l.elapsed_time,
+        distance: l.distance,
+        moving_time: l.elapsed_time,
+        start_index: i,
+        end_index: i + 1,
+        lap_index: i + 1,
+      })),
+    };
+  }
+
+  it("does NOT detect 1000m tempo laps as intervals on a tempo run", () => {
+    // 10 consistent 1000m laps — classic tempo run
+    const laps = Array.from({ length: 10 }, () => ({ distance: 1000, elapsed_time: 340 }));
+    const activity = makeTempoActivity("Tempo Run", laps);
+    expect(parseIntervalSession(activity)).toBeNull();
+  });
+
+  it("DOES detect 100m strides embedded in a tempo run", () => {
+    const laps = [
+      { distance: 1000, elapsed_time: 420 }, // warmup
+      { distance: 100,  elapsed_time: 26 },  // stride
+      { distance: 20,   elapsed_time: 29 },  // recovery gap
+      { distance: 100,  elapsed_time: 25 },  // stride
+      { distance: 20,   elapsed_time: 29 },
+      { distance: 100,  elapsed_time: 26 },  // stride
+    ];
+    const activity = makeTempoActivity("Tempo Run with strides", laps);
+    const result = parseIntervalSession(activity);
+    expect(result).not.toBeNull();
+    expect((result as ParsedInterval).distance).toBe(100);
+  });
+
+  it("still detects description-parsed intervals on a tempo run (e.g. Tempo + 5x400m)", () => {
+    const activity = makeTempoActivity("Tempo + 5x400m", [
+      { distance: 400, elapsed_time: 88 },
+      { distance: 200, elapsed_time: 120 },
+      { distance: 400, elapsed_time: 90 },
+      { distance: 200, elapsed_time: 115 },
+      { distance: 400, elapsed_time: 86 },
+    ]);
+    const result = parseIntervalSession(activity);
+    expect(result).not.toBeNull();
+    expect((result as ParsedInterval).distance).toBe(400);
+    expect((result as ParsedInterval).detected_by).toBe("description");
+  });
+});
+
 describe("inferDistanceFromLaps - 100m strides", () => {
   // Helper to build a stride lap set: strideCount fast 100m laps,
   // each followed by a tiny 20m standing pause.
