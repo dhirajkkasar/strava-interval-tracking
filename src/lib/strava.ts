@@ -184,13 +184,15 @@ export function inferDistanceFromLaps(
         return { distance: Number(val), count: workIndices.size };
       }
     }
-    // If all matched laps cover a consistent distance (within 20%), this is
-    // almost certainly a distance-based interval whose time happens to fall
-    // near a time-bucket boundary. Skip it and let distance detection handle it.
+    // Skip if the laps cluster tightly around a standard interval distance —
+    // that means it's a distance-based interval whose time incidentally falls
+    // near this bucket (e.g. 400m at ~90s). Use a tight 8% tolerance so that
+    // genuine time-based work laps (~220m at 1min) are not mistakenly skipped:
+    // 220m is 10% away from 200m, which is outside the 8% window.
     const matchedDists = [...indices].map((i) => laps[i].distance);
-    const distMin = Math.min(...matchedDists);
-    const distMax = Math.max(...matchedDists);
-    if (distMax < distMin * 1.2) continue;
+    const medianDist = [...matchedDists].sort((a, b) => a - b)[Math.floor(matchedDists.length / 2)];
+    const coversStandardDist = validValues.some(d => d > 0 && Math.abs(d - medianDist) < d * 0.08);
+    if (coversStandardDist) continue;
 
     // Normal case: check for interval pattern
     if (hasIntervalPattern(indices)) {
