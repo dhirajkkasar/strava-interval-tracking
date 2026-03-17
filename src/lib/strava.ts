@@ -1,128 +1,109 @@
 import { DetailedActivity, ParsedInterval, INTERVAL_DISTANCES, isTimeBasedInterval, getIntervalDurationSeconds } from "../types";
 
-/**
- * Parse activity name/description for interval patterns like "5x400m", "3x800m", "5x1min", etc.
- */
 type DetectedInterval = { distance: number; count: number };
 
-export function parseDescriptionForIntervals(
+/**
+ * Extract candidate interval distances from activity name/description.
+ * Returns a flat list of valid distances found (e.g. [100, 400] or [-60]).
+ * This is used as a hint to guide lap inference — laps always validate.
+ */
+export function extractDescriptionHints(
   name: string | null,
   description: string | null
-): DetectedInterval | DetectedInterval[] | null {
-  // Check both name and description
+): number[] {
   const texts = [name, description].filter(Boolean) as string[];
-  if (texts.length === 0) return null;
+  if (texts.length === 0) return [];
 
   const allTexts = texts.join(" ");
   const isLadderKeyword = /ladder|pyramid/i.test(allTexts);
   const validDistances = Object.values(INTERVAL_DISTANCES);
+  const hints = new Set<number>();
 
   for (const text of texts) {
     // Time-based: "5x1min", "5 x 2 min", "5×1min", "5*1min"
-    const timePatterns = [
-      /(\d+)\s*[x×*]\s*(\d+)\s*min/gi,
-    ];
-
-    for (const pattern of timePatterns) {
-      pattern.lastIndex = 0;
-      const match = pattern.exec(text);
-      if (match) {
-        const count = parseInt(match[1]);
-        const minutes = parseInt(match[2]);
-        const intervalValue = -(minutes * 60);
-        if (validDistances.includes(intervalValue as typeof validDistances[number])) {
-          return { distance: intervalValue, count };
-        }
+    const timePattern = /(\d+)\s*[x×*]\s*(\d+)\s*min/gi;
+    timePattern.lastIndex = 0;
+    let match;
+    while ((match = timePattern.exec(text)) !== null) {
+      const intervalValue = -(parseInt(match[2]) * 60);
+      if (validDistances.includes(intervalValue as typeof validDistances[number])) {
+        hints.add(intervalValue);
       }
     }
 
-    // Distance-based: "5x400m", "5 x 400m", "5×400m", "5*400m", "400m x 5", "5 repeat of 400m"
-    // Also handles grouped sets like "12 *(400m fast + 200m recovery)" where ( follows the separator.
+    // Distance-based: "5x400m", "5 x 400m", "5×400m", "5*400m", "400m x 5",
+    // "5 repeat of 400m", and grouped sets like "12 *(400m fast + 200m recovery)"
     const distPatterns: Array<{ regex: RegExp; reversed: boolean }> = [
-      { regex: /(\d+)\s*[x×*]\s*\(?\s*(\d+)\s*(?:m|meter)/gi, reversed: false },  // 5x400m, 12*(400m
-      { regex: /(\d+)\s*(?:m|meter)\s*[x×*]\s*(\d+)/gi, reversed: true },          // 400m x 5
-      { regex: /(\d+)\s*repeat\s*(?:of\s+)?(\d+)\s*m/gi, reversed: false },        // 5 repeat of 400m
+      { regex: /(\d+)\s*[x×*]\s*\(?\s*(\d+)\s*(?:m|meter)/gi, reversed: false },
+      { regex: /(\d+)\s*(?:m|meter)\s*[x×*]\s*(\d+)/gi, reversed: true },
+      { regex: /(\d+)\s*repeat\s*(?:of\s+)?(\d+)\s*m/gi, reversed: false },
     ];
-
-    // Collect ALL valid matches across the whole text, then prefer the one
-    // with the highest count. This handles descriptions like:
-    // "4 * 100m strides + 12 *(400m fast + 200m recovery)" — 12 > 4 so 400m wins.
-    const allDistMatches: Array<{ distance: number; count: number }> = [];
     for (const { regex, reversed } of distPatterns) {
       regex.lastIndex = 0;
-      let match;
       while ((match = regex.exec(text)) !== null) {
-        const count    = reversed ? parseInt(match[2]) : parseInt(match[1]);
         const distance = reversed ? parseInt(match[1]) : parseInt(match[2]);
         if (validDistances.includes(distance as typeof validDistances[number])) {
-          allDistMatches.push({ distance, count });
+          hints.add(distance);
         }
       }
-    }
-    if (allDistMatches.length > 0) {
-      allDistMatches.sort((a, b) => b.count - a.count);
-      return allDistMatches[0];
     }
 
     // Ladder: "200-400-800m", "200, 400, 800m", "200/400/800m"
-    // Requires "ladder"/"pyramid" keyword OR the sequence itself ends with m
     const ladderMatch = text.match(/(\d+(?:\s*[-,/]\s*\d+)+)\s*m\b/i);
     if (ladderMatch) {
       const nums = ladderMatch[1].split(/\s*[-,/]\s*/).map(Number);
       if (nums.length >= 2) {
-        // Every distance must be a valid interval distance
-        const allValid = nums.every(d =>
-          validDistances.includes(d as typeof validDistances[number])
-        );
-        // Must be ascending or descending (not all same — that's NxDm territory)
+        const allValid = nums.every(d => validDistances.includes(d as typeof validDistances[number]));
         const isAscending = nums.every((d, i) => i === 0 || d >= nums[i - 1]);
         const isDescending = nums.every((d, i) => i === 0 || d <= nums[i - 1]);
         const allSame = nums.every(d => d === nums[0]);
         if (allValid && !allSame && (isAscending || isDescending || isLadderKeyword)) {
-          return nums.map(d => ({ distance: d, count: 1 }));
+          nums.forEach(d => hints.add(d));
         }
       }
     }
   }
 
-  // Check if "ladder" keyword present but distances are in the other text field
+  // Ladder keyword with comma-separated distances in a separate field
   if (isLadderKeyword) {
     for (const text of texts) {
       const commaMatch = text.match(/(\d+(?:\s*,\s*\d+)+)\s*m?\b/i);
       if (commaMatch) {
         const nums = commaMatch[1].split(/\s*,\s*/).map(Number);
         if (nums.length >= 2) {
-          const allValid = nums.every(d =>
-            validDistances.includes(d as typeof validDistances[number])
-          );
+          const allValid = nums.every(d => validDistances.includes(d as typeof validDistances[number]));
           const allSame = nums.every(d => d === nums[0]);
           if (allValid && !allSame) {
-            return nums.map(d => ({ distance: d, count: 1 }));
+            nums.forEach(d => hints.add(d));
           }
         }
       }
     }
   }
 
-  return null;
+  return [...hints];
 }
 
 /**
- * Infer interval distance from lap data.
- * Intervals are distinguished from steady/tempo runs by requiring recovery laps
- * interspersed between work laps — the hallmark of interval training.
+ * Infer interval distances from lap data. Laps are the authoritative source.
+ * Accepts optional description hints to guide the search (hinted distances
+ * are validated first; un-hinted patterns are also scanned).
+ * Always returns an array — empty if no interval pattern is found.
  */
 export function inferDistanceFromLaps(
-  rawLaps: any[]
-): DetectedInterval | DetectedInterval[] | null {
-  if (!rawLaps || rawLaps.length < 3) return null;
+  rawLaps: any[],
+  hints?: number[]
+): DetectedInterval[] {
+  if (!rawLaps || rawLaps.length < 3) return [];
 
   // Filter out micro-laps (<50m) — GPS noise, drills, standing pauses
   const laps = rawLaps.filter((lap: any) => lap.distance >= 50);
-  if (laps.length < 3) return null;
+  if (laps.length < 3) return [];
 
   const validValues = Object.values(INTERVAL_DISTANCES);
   const paces = laps.map((lap: any) => lap.elapsed_time / (lap.distance || 1));
+  const results: DetectedInterval[] = [];
+  const seen = new Set<number>();
 
   /**
    * Verify interval pattern: work laps must be individually separated by
@@ -144,12 +125,9 @@ export function inferDistanceFromLaps(
     for (let i = 0; i < workIndices.length - 1; i++) {
       if (workIndices[i + 1] - workIndices[i] > 1) separatedPairs++;
     }
-    // At least 75% of consecutive pairs must be separated by recovery.
-    // 50% was too permissive — tempo runs with GPS artifact laps could pass.
     if (separatedPairs < (workIndices.length - 1) * 0.75) return false;
 
     // For pace comparison, use only meaningful rest laps (≥100m).
-    // Tiny GPS artifacts (50–99m) have unreliable paces and skew the average.
     const meaningfulRestIndices = restIndices.filter((i: number) => laps[i].distance >= 100);
     const restForPace = meaningfulRestIndices.length > 0 ? meaningfulRestIndices : restIndices;
 
@@ -159,14 +137,10 @@ export function inferDistanceFromLaps(
     const avgRestPace =
       restForPace.reduce((s: number, i: number) => s + paces[i], 0) / restForPace.length;
 
-    if (avgWorkPace >= avgRestPace * 0.8) return false;
-
-    return true;
+    return avgWorkPace < avgRestPace * 0.8;
   }
 
   // --- Time-based matching ---
-  // Special case: when all laps have similar elapsed_time (e.g., all 60s),
-  // use distance variance to split work vs rest
   const timeBuckets: { [key: number]: Set<number> } = {};
   laps.forEach((lap: any, i: number) => {
     const match = validValues.find(
@@ -179,33 +153,35 @@ export function inferDistanceFromLaps(
   });
 
   for (const [val, indices] of Object.entries(timeBuckets)) {
-    // If most laps match this time bucket, split by distance
+    const numVal = Number(val);
+    if (seen.has(numVal)) continue;
+
+    // If most laps match this time bucket, split by distance (work vs rest)
     if (indices.size > laps.length * 0.6) {
       const matchedLaps = [...indices].map((i) => ({ i, dist: laps[i].distance }));
       const medianDist = matchedLaps
         .map((l) => l.dist)
         .sort((a: number, b: number) => a - b)[Math.floor(matchedLaps.length / 2)];
-      // Work laps are the ones covering more distance (faster running)
       const workIndices = new Set(
         matchedLaps.filter((l) => l.dist > medianDist * 0.6).map((l) => l.i)
       );
       if (workIndices.size >= 2 && workIndices.size < indices.size) {
-        return { distance: Number(val), count: workIndices.size };
+        results.push({ distance: numVal, count: workIndices.size });
+        seen.add(numVal);
+        continue;
       }
     }
-    // Skip if the laps cluster tightly around a standard interval distance —
-    // that means it's a distance-based interval whose time incidentally falls
-    // near this bucket (e.g. 400m at ~90s). Use a tight 8% tolerance so that
-    // genuine time-based work laps (~220m at 1min) are not mistakenly skipped:
-    // 220m is 10% away from 200m, which is outside the 8% window.
+
+    // Skip if laps cluster tightly around a standard distance — it's a
+    // distance-based interval whose time incidentally falls near this bucket.
     const matchedDists = [...indices].map((i) => laps[i].distance);
     const medianDist = [...matchedDists].sort((a, b) => a - b)[Math.floor(matchedDists.length / 2)];
     const coversStandardDist = validValues.some(d => d > 0 && Math.abs(d - medianDist) < d * 0.08);
     if (coversStandardDist) continue;
 
-    // Normal case: check for interval pattern
     if (hasIntervalPattern(indices)) {
-      return { distance: Number(val), count: indices.size };
+      results.push({ distance: numVal, count: indices.size });
+      seen.add(numVal);
     }
   }
 
@@ -219,23 +195,34 @@ export function inferDistanceFromLaps(
     }
   });
 
-  // Filter to buckets that pass interval pattern, then prefer LARGER distance
-  // (work laps are typically longer distances, recovery jogs are shorter)
   const validDistBuckets = Object.entries(distBuckets)
-    .filter(([, indices]) => hasIntervalPattern(indices))
-    .sort((a, b) => Number(b[0]) - Number(a[0])); // prefer larger distance
+    .filter(([, indices]) => hasIntervalPattern(indices));
 
-  if (validDistBuckets.length > 0) {
-    const [dist, indices] = validDistBuckets[0];
-    return { distance: Number(dist), count: indices.size };
+  // Check hinted distances first, then remaining valid buckets.
+  // Larger distances still win when two buckets compete for the same laps
+  // (sort by descending distance within each group).
+  const hintedBuckets = hints && hints.length > 0
+    ? validDistBuckets
+        .filter(([d]) => hints.includes(Number(d)))
+        .sort((a, b) => Number(b[0]) - Number(a[0]))
+    : [];
+  const otherBuckets = validDistBuckets
+    .filter(([d]) => !hintedBuckets.some(([hd]) => hd === d))
+    .sort((a, b) => Number(b[0]) - Number(a[0]));
+
+  for (const [dist, indices] of [...hintedBuckets, ...otherBuckets]) {
+    const numDist = Number(dist);
+    if (!seen.has(numDist)) {
+      results.push({ distance: numDist, count: indices.size });
+      seen.add(numDist);
+    }
   }
 
   // --- 100m stride detection (operates on rawLaps to preserve recovery gaps) ---
-  // Criterion: fast 100m laps separated by very slow or tiny recovery laps.
-  // GPS artifact 100m laps in tempo/interval runs are ruled out by requiring
-  // that strides outnumber the longer-distance laps in the activity.
+  // When hints include 100, bypass the longLapCount guard — the description
+  // explicitly names strides so they can coexist with many interval laps.
   {
-    const STRIDE_PACE_THRESHOLD = 0.40; // faster than 6:40/km (0.40 sec/m)
+    const STRIDE_PACE_THRESHOLD = 0.40; // faster than 6:40/km
     const fastStrideLaps: number[] = [];
     for (let i = 0; i < rawLaps.length; i++) {
       const lap = rawLaps[i];
@@ -246,14 +233,11 @@ export function inferDistanceFromLaps(
       }
     }
 
-    if (fastStrideLaps.length >= 3) {
-      // Count laps with distance > 300m in the raw activity.
-      // If there are more long laps than strides, the 100m laps are likely
-      // GPS transition artifacts in a longer run (tempo/intervals), not real strides.
+    if (fastStrideLaps.length >= 3 && !seen.has(100)) {
       const longLapCount = rawLaps.filter((l: any) => l.distance > 300).length;
-      if (fastStrideLaps.length >= longLapCount) {
-        // Check that consecutive strides are separated by a slow/tiny recovery:
-        // either a sub-50m GPS drift lap OR any lap at walking pace (>1.5 sec/m).
+      const strideHinted = hints?.includes(100) ?? false;
+
+      if (fastStrideLaps.length >= longLapCount || strideHinted) {
         let separatedPairs = 0;
         for (let i = 0; i < fastStrideLaps.length - 1; i++) {
           const a = fastStrideLaps[i], b = fastStrideLaps[i + 1];
@@ -267,19 +251,20 @@ export function inferDistanceFromLaps(
         }
         const required = Math.ceil((fastStrideLaps.length - 1) * 0.5);
         if (separatedPairs >= required) {
-          return { distance: 100, count: fastStrideLaps.length };
+          results.push({ distance: 100, count: fastStrideLaps.length });
+          seen.add(100);
         }
       }
     }
   }
 
   // --- Ladder detection ---
-  // Identify fast (work) laps by pace, then check if they form an
-  // ascending or descending sequence of different valid distances.
+  // Identify fast (work) laps by pace forming an ascending or descending
+  // sequence of distinct valid distances.
   const avgPace = paces.reduce((s, p) => s + p, 0) / paces.length;
   const fastLaps: { index: number; distance: number }[] = [];
   laps.forEach((lap: any, i: number) => {
-    if (paces[i] > avgPace) return; // skip slow laps
+    if (paces[i] > avgPace) return;
     const match = validValues.find((d) => d > 0 && Math.abs(d - lap.distance) < d * 0.15);
     if (match) fastLaps.push({ index: i, distance: match });
   });
@@ -292,12 +277,17 @@ export function inferDistanceFromLaps(
       const isDescending = distances.every((d, i) => i === 0 || d <= distances[i - 1]);
 
       if (isAscending || isDescending) {
-        return fastLaps.map(m => ({ distance: m.distance, count: 1 }));
+        for (const m of fastLaps) {
+          if (!seen.has(m.distance)) {
+            results.push({ distance: m.distance, count: 1 });
+            seen.add(m.distance);
+          }
+        }
       }
     }
   }
 
-  return null;
+  return results;
 }
 
 /**
@@ -316,113 +306,93 @@ export function calculatePace(distance: number, timeSeconds: number): string {
 }
 
 /**
- * Parse interval session from activity
- * Returns array of intervals found in the activity
+ * Parse interval session from activity.
+ * Laps are always the authoritative source. Description provides hints for
+ * which distances to look for, but every detected distance is lap-validated.
+ * Always returns an array — empty if no intervals are found.
  */
 export function parseIntervalSession(
   activity: DetailedActivity
-): ParsedInterval | ParsedInterval[] | null {
+): ParsedInterval[] {
   const { id, name, description, start_date, start_date_local } = activity;
 
-  // Need at least 2 laps for interval detection
-  if (!activity.laps || activity.laps.length < 2) return null;
+  if (!activity.laps || activity.laps.length < 2) return [];
 
-  let detected: DetectedInterval | DetectedInterval[] | null = null;
-  let detected_by: "description" | "lap" | "segment" | "unknown" = "unknown";
+  // Extract candidate distances from description as hints
+  const hints = extractDescriptionHints(name, description);
 
-  // Try to parse from name/description first
-  detected = parseDescriptionForIntervals(name, description);
-  if (detected) {
-    detected_by = "description";
+  // Lap inference is the truth — always run, hints guide the search
+  let detected = inferDistanceFromLaps(activity.laps, hints);
+
+  // For tempo runs, only keep:
+  //   • 100m strides (always valid)
+  //   • Distances explicitly mentioned in the description (e.g. "Tempo + 5x400m")
+  // This prevents tempo-paced km laps from being reported as intervals
+  // while still honouring intentional interval sets within a tempo run.
+  if (/tempo/i.test(name ?? "")) {
+    detected = detected.filter(d => d.distance === 100 || hints.includes(d.distance));
   }
 
-  // Fall back to lap data analysis
-  if (!detected) {
-    detected = inferDistanceFromLaps(activity.laps);
-    if (detected) {
-      detected_by = "lap";
-    }
-  }
-
-  // For tempo runs, only 100m strides are valid lap-inferred intervals.
-  // The tempo-paced km laps must not be reported as interval work.
-  // Description-detected intervals (e.g. "Tempo + 5x400m") are still kept.
-  if (detected && detected_by === "lap" && /tempo/i.test(name ?? "")) {
-    const is100m = !Array.isArray(detected) && detected.distance === 100;
-    if (!is100m) detected = null;
-  }
-
-  if (!detected) return null;
+  if (detected.length === 0) return [];
 
   const sessionDate = (start_date_local || start_date).split("T")[0];
+  const output: ParsedInterval[] = [];
 
-  // Ladder: return one ParsedInterval per distance
-  if (Array.isArray(detected)) {
-    return detected.map(d => {
-      // Find the best matching lap for this distance
-      const matchingLap = activity.laps!.find(
-        lap => Math.abs(lap.distance - d.distance) < d.distance * 0.15
-      );
-      const time = matchingLap ? matchingLap.elapsed_time : 0;
-      return {
-        sessionId: id,
-        sessionDate,
-        activityName: name,
-        distance: d.distance,
-        avgTime: Math.round(time),
-        avgPace: calculatePace(d.distance, time),
-        detected_by,
-      };
+  for (const d of detected) {
+    let totalIntervalTime = 0;
+    let intervalCount = 0;
+    let totalIntervalDistance = 0;
+
+    if (isTimeBasedInterval(d.distance)) {
+      // Time-based: match laps by elapsed_time.
+      // Sort by distance descending (most distance = harder effort = work lap)
+      // and take only the top d.count laps to exclude recovery laps.
+      const targetSeconds = getIntervalDurationSeconds(d.distance);
+      const matchingLaps = activity.laps!
+        .filter(lap => Math.abs(lap.elapsed_time - targetSeconds) < targetSeconds * 0.15)
+        .sort((a, b) => b.distance - a.distance)
+        .slice(0, d.count);
+      for (const lap of matchingLaps) {
+        totalIntervalTime += lap.elapsed_time;
+        totalIntervalDistance += lap.distance;
+        intervalCount++;
+      }
+    } else {
+      // Distance-based: match laps by distance.
+      // Sort by pace ascending (fastest = work lap) and take only d.count laps.
+      // This excludes same-distance recovery laps (e.g. 200m jogs in a ladder).
+      const matchingLaps = activity.laps!
+        .filter(lap => Math.abs(lap.distance - d.distance) < d.distance * 0.15)
+        .sort((a, b) => (a.elapsed_time / (a.distance || 1)) - (b.elapsed_time / (b.distance || 1)))
+        .slice(0, d.count);
+      for (const lap of matchingLaps) {
+        totalIntervalTime += lap.elapsed_time;
+        intervalCount++;
+      }
+    }
+
+    if (intervalCount === 0) continue;
+
+    const avgTime = Math.round(totalIntervalTime / intervalCount);
+    const avgPace = isTimeBasedInterval(d.distance)
+      ? calculatePace(totalIntervalDistance / intervalCount, avgTime)
+      : calculatePace(d.distance, avgTime);
+
+    output.push({
+      sessionId: id,
+      sessionDate,
+      activityName: name,
+      distance: d.distance,
+      avgTime,
+      avgPace,
+      ...(isTimeBasedInterval(d.distance) && {
+        avgCoveredDistance: Math.round(totalIntervalDistance / intervalCount),
+      }),
+      detected_by: "lap",
     });
   }
 
-  // Single distance: existing logic
-  let totalIntervalTime = 0;
-  let intervalCount = 0;
-  let totalIntervalDistance = 0;
-
-  if (activity.laps) {
-    if (isTimeBasedInterval(detected.distance)) {
-      // Time-based: match laps by elapsed_time
-      const targetSeconds = getIntervalDurationSeconds(detected.distance);
-      for (const lap of activity.laps) {
-        if (Math.abs(lap.elapsed_time - targetSeconds) < targetSeconds * 0.15) {
-          totalIntervalTime += lap.elapsed_time;
-          totalIntervalDistance += lap.distance;
-          intervalCount++;
-        }
-      }
-    } else {
-      // Distance-based: match laps by distance
-      for (const lap of activity.laps) {
-        if (Math.abs(lap.distance - detected.distance) < detected.distance * 0.15) {
-          totalIntervalTime += lap.elapsed_time;
-          intervalCount++;
-        }
-      }
-    }
-  }
-
-  if (intervalCount === 0) return null;
-
-  const avgTime = Math.round(totalIntervalTime / intervalCount);
-  // For time-based intervals, calculate pace from average distance covered
-  const avgPace = isTimeBasedInterval(detected.distance)
-    ? calculatePace(totalIntervalDistance / intervalCount, avgTime)
-    : calculatePace(detected.distance, avgTime);
-
-  return {
-    sessionId: id,
-    sessionDate: (start_date_local || start_date).split("T")[0],
-    activityName: name,
-    distance: detected.distance,
-    avgTime,
-    avgPace,
-    ...(isTimeBasedInterval(detected.distance) && {
-      avgCoveredDistance: Math.round(totalIntervalDistance / intervalCount),
-    }),
-    detected_by,
-  };
+  return output;
 }
 
 /**

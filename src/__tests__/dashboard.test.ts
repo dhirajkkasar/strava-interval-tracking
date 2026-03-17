@@ -28,6 +28,11 @@ const mockFetchActivities = fetchStravaActivities as jest.MockedFunction<typeof 
 const mockFetchDetailed = fetchDetailedActivity as jest.MockedFunction<typeof fetchDetailedActivity>;
 const mockParseInterval = parseIntervalSession as jest.MockedFunction<typeof parseIntervalSession>;
 
+// parseIntervalSession now always returns ParsedInterval[] (empty array if nothing found)
+function interval(overrides: object) {
+  return { sessionId: 1, sessionDate: "2024-01-15", activityName: "5x400m", distance: 400, avgTime: 90, avgPace: "3:45", detected_by: "lap" as const, ...overrides };
+}
+
 function makeRequest(body: object): NextRequest {
   return new NextRequest("http://localhost:3000/api/dashboard", {
     method: "POST",
@@ -80,15 +85,7 @@ describe("POST /api/dashboard", () => {
       { id: 1, name: "5x400m intervals", description: "5x400m", workout_type: 3, type: "Run", sport_type: "Run" },
     ]);
     mockFetchDetailed.mockResolvedValue({} as any);
-    mockParseInterval.mockReturnValue({
-      sessionId: 1,
-      sessionDate: "2024-01-15",
-      activityName: "5x400m intervals",
-      distance: 400,
-      avgTime: 90,
-      avgPace: "3:45",
-      detected_by: "description",
-    });
+    mockParseInterval.mockReturnValue([interval({ sessionId: 1 })]);
 
     const res = await POST(makeRequest({ startDate: "2024-01-01", endDate: "2024-02-01", distance: 400 }));
     const data = await res.json();
@@ -110,8 +107,8 @@ describe("POST /api/dashboard", () => {
     ]);
     mockFetchDetailed.mockResolvedValue({} as any);
     mockParseInterval
-      .mockReturnValueOnce({ sessionId: 1, sessionDate: "2024-01-15", activityName: "5x400m", distance: 400, avgTime: 90, avgPace: "3:45", detected_by: "description" })
-      .mockReturnValueOnce({ sessionId: 2, sessionDate: "2024-01-16", activityName: "3x800m", distance: 800, avgTime: 180, avgPace: "3:45", detected_by: "description" });
+      .mockReturnValueOnce([interval({ sessionId: 1, distance: 400 })])
+      .mockReturnValueOnce([interval({ sessionId: 2, sessionDate: "2024-01-16", distance: 800, avgTime: 180 })]);
 
     const res = await POST(makeRequest({ startDate: "2024-01-01", endDate: "2024-02-01", distance: 400 }));
     const data = await res.json();
@@ -128,8 +125,8 @@ describe("POST /api/dashboard", () => {
     ]);
     mockFetchDetailed.mockResolvedValue({} as any);
     mockParseInterval
-      .mockReturnValueOnce({ sessionId: 1, sessionDate: "2024-01-15", activityName: "5x400m AM", distance: 400, avgTime: 90, avgPace: "3:45", detected_by: "description" })
-      .mockReturnValueOnce({ sessionId: 2, sessionDate: "2024-01-15", activityName: "5x400m PM", distance: 400, avgTime: 100, avgPace: "4:10", detected_by: "description" });
+      .mockReturnValueOnce([interval({ sessionId: 1, avgTime: 90 })])
+      .mockReturnValueOnce([interval({ sessionId: 2, avgTime: 100 })]);
 
     const res = await POST(makeRequest({ startDate: "2024-01-01", endDate: "2024-02-01", distance: 400 }));
     const data = await res.json();
@@ -137,6 +134,27 @@ describe("POST /api/dashboard", () => {
     expect(data.dailyAverages).toHaveLength(1);
     expect(data.dailyAverages[0].avgTime).toBe(95); // avg of 90 and 100
     expect(data.dailyAverages[0].sessions).toHaveLength(2);
+  });
+
+  it("produces separate daily averages for different distances on the same date", async () => {
+    mockGetServerSession.mockResolvedValue({ accessToken: "tok" } as any);
+    mockFetchActivities.mockResolvedValue([
+      { id: 1, name: "Intervals", workout_type: 3, type: "Run", sport_type: "Run" },
+    ]);
+    mockFetchDetailed.mockResolvedValue({} as any);
+    // One activity returns both 100m strides and 400m intervals
+    mockParseInterval.mockReturnValueOnce([
+      interval({ sessionId: 1, distance: 100, avgTime: 26, avgPace: "4:20" }),
+      interval({ sessionId: 1, distance: 400, avgTime: 85, avgPace: "3:32" }),
+    ]);
+
+    const res = await POST(makeRequest({ startDate: "2024-01-01", endDate: "2024-02-01" }));
+    const data = await res.json();
+
+    expect(data.intervals).toHaveLength(2);
+    expect(data.dailyAverages).toHaveLength(2); // separate bucket per (date, distance)
+    const dists = data.dailyAverages.map((d: any) => d.distance).sort((a: number, b: number) => a - b);
+    expect(dists).toEqual([100, 400]);
   });
 
   it("only fetches details for interval-looking Run activities", async () => {
@@ -147,11 +165,10 @@ describe("POST /api/dashboard", () => {
       { id: 3, name: "Bike ride",        type: "Ride", sport_type: "Ride" }, // not a run → skipped
     ]);
     mockFetchDetailed.mockResolvedValue({} as any);
-    mockParseInterval.mockReturnValue(null);
+    mockParseInterval.mockReturnValue([]);
 
     await POST(makeRequest({ startDate: "2024-01-01", endDate: "2024-02-01" }));
 
-    // Only the interval Run should trigger a detailed fetch
     expect(mockFetchDetailed).toHaveBeenCalledTimes(1);
     expect(mockFetchDetailed).toHaveBeenCalledWith("tok", 1);
   });

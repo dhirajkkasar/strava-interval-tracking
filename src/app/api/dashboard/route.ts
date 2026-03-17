@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
 import { fetchStravaActivities, fetchDetailedActivity, looksLikeIntervalActivity, parseIntervalSession, calculatePace } from "../../../lib/strava";
+// parseIntervalSession now always returns ParsedInterval[] (empty array if nothing found)
 import { ParsedInterval, IntervalDay, INTERVAL_DISTANCES, isTimeBasedInterval } from "../../../types";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -88,29 +89,30 @@ export async function POST(request: NextRequest) {
           }
           continue;
         }
-        if (result.value) {
-          const intervals = Array.isArray(result.value) ? result.value : [result.value];
-          for (const interval of intervals) {
-            if (!distance || interval.distance === distance) {
-              parsedIntervals.push(interval);
-            }
+        for (const interval of result.value) {
+          if (!distance || interval.distance === distance) {
+            parsedIntervals.push(interval);
           }
         }
       }
     }
     console.log("📈 [Dashboard API] Total parsed intervals:", parsedIntervals.length);
 
-    // Group by date and calculate daily averages
+    // Group by date+distance — one bucket per unique (date, distance) pair.
+    // An activity can produce multiple interval types (e.g. 100m strides AND 400m),
+    // so we must not conflate them into a single daily bucket.
     const dailyMap: { [key: string]: ParsedInterval[] } = {};
 
     for (const interval of parsedIntervals) {
-      if (!dailyMap[interval.sessionDate]) {
-        dailyMap[interval.sessionDate] = [];
+      const key = `${interval.sessionDate}|${interval.distance}`;
+      if (!dailyMap[key]) {
+        dailyMap[key] = [];
       }
-      dailyMap[interval.sessionDate].push(interval);
+      dailyMap[key].push(interval);
     }
 
-    const dailyAverages: IntervalDay[] = Object.entries(dailyMap).map(([date, intervals]) => {
+    const dailyAverages: IntervalDay[] = Object.entries(dailyMap).map(([, intervals]) => {
+      const date = intervals[0].sessionDate;
       const avgTime = Math.round(intervals.reduce((sum, i) => sum + i.avgTime, 0) / intervals.length);
       const distanceVal = intervals[0].distance;
       // For time-based intervals, average the per-session paces since distance varies
@@ -119,7 +121,7 @@ export async function POST(request: NextRequest) {
         : calculatePace(distanceVal, avgTime);
 
       return {
-        date,
+        date: date,
         distance: distanceVal,
         avgTime,
         avgPace,

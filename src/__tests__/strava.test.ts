@@ -1,88 +1,91 @@
 import {
-  parseDescriptionForIntervals,
+  extractDescriptionHints,
   inferDistanceFromLaps,
   calculatePace,
   parseIntervalSession,
 } from "../lib/strava";
-import { DetailedActivity } from "../types";
+import { DetailedActivity, ParsedInterval } from "../types";
 
-// --- parseDescriptionForIntervals ---
+// --- extractDescriptionHints ---
 
-describe("parseDescriptionForIntervals", () => {
-  it("parses 'NxDISTm' from name", () => {
-    expect(parseDescriptionForIntervals("5x400m intervals", null)).toEqual({ distance: 400, count: 5 });
+describe("extractDescriptionHints", () => {
+  it("extracts distance from 'NxDISTm' in name", () => {
+    expect(extractDescriptionHints("5x400m intervals", null)).toEqual([400]);
   });
 
-  it("parses from description when name has no pattern", () => {
-    expect(parseDescriptionForIntervals("Morning run", "3x800m repeats")).toEqual({ distance: 800, count: 3 });
+  it("extracts from description when name has no pattern", () => {
+    expect(extractDescriptionHints("Morning run", "3x800m repeats")).toEqual([800]);
   });
 
-  it("parses × (multiplication sign)", () => {
-    expect(parseDescriptionForIntervals("4×1600m", null)).toEqual({ distance: 1600, count: 4 });
+  it("extracts × (multiplication sign)", () => {
+    expect(extractDescriptionHints("4×1600m", null)).toEqual([1600]);
   });
 
-  it("parses with spaces around x", () => {
-    expect(parseDescriptionForIntervals("6 x 200m", null)).toEqual({ distance: 200, count: 6 });
+  it("extracts with spaces around x", () => {
+    expect(extractDescriptionHints("6 x 200m", null)).toEqual([200]);
   });
 
-  it("parses time-based intervals like 5x1min", () => {
-    expect(parseDescriptionForIntervals("5x1min intervals", null)).toEqual({ distance: -60, count: 5 });
+  it("extracts time-based intervals like 5x1min", () => {
+    expect(extractDescriptionHints("5x1min intervals", null)).toEqual([-60]);
   });
 
-  it("returns null for non-interval descriptions", () => {
-    expect(parseDescriptionForIntervals("Easy 10k run", "Recovery jog")).toBeNull();
+  it("returns [] for non-interval descriptions", () => {
+    expect(extractDescriptionHints("Easy 10k run", "Recovery jog")).toEqual([]);
   });
 
-  it("returns null for unsupported distances", () => {
-    expect(parseDescriptionForIntervals("3x300m", null)).toBeNull();
+  it("returns [] for unsupported distances", () => {
+    expect(extractDescriptionHints("3x300m", null)).toEqual([]);
   });
 
-  it("returns null for null/empty inputs", () => {
-    expect(parseDescriptionForIntervals(null, null)).toBeNull();
+  it("returns [] for null/empty inputs", () => {
+    expect(extractDescriptionHints(null, null)).toEqual([]);
   });
 
-  it("prefers name match over description", () => {
-    expect(parseDescriptionForIntervals("5x400m", "3x800m")).toEqual({ distance: 400, count: 5 });
+  it("returns ALL distances when name and description both have patterns", () => {
+    // Both distances are valid hints — no preference, both returned
+    expect(extractDescriptionHints("5x400m", "3x800m")).toEqual(
+      expect.arrayContaining([400, 800])
+    );
   });
 
-  it("parses asterisk separator", () => {
-    expect(parseDescriptionForIntervals("5*400m", null)).toEqual({ distance: 400, count: 5 });
+  it("extracts asterisk separator", () => {
+    expect(extractDescriptionHints("5*400m", null)).toEqual([400]);
   });
 
-  it("handles grouped set notation like '12 *(400m fast + 200m recovery)'", () => {
-    // The '(' after '*' used to break the regex match
+  it("extracts ALL distances from compound description like '4*100m strides + 12*(400m)'", () => {
     const desc = "2k warmup + 4 * 100m strides + 12 *(400m fast + 200m recovery) + 0.5k cooldown";
-    expect(parseDescriptionForIntervals("Intervals", desc)).toEqual({ distance: 400, count: 12 });
+    const hints = extractDescriptionHints("Intervals", desc);
+    expect(hints).toEqual(expect.arrayContaining([100, 400]));
+    expect(hints).toHaveLength(2);
   });
 
-  it("picks highest-count match when description has multiple NxDm patterns", () => {
-    // 4 * 100m strides should lose to 12 * 400m
+  it("returns both distances when description has multiple NxDm patterns", () => {
     const desc = "4 * 100m strides + 12 * 400m";
-    expect(parseDescriptionForIntervals("Workout", desc)).toEqual({ distance: 400, count: 12 });
+    const hints = extractDescriptionHints("Workout", desc);
+    expect(hints).toEqual(expect.arrayContaining([100, 400]));
+    expect(hints).toHaveLength(2);
   });
 });
 
 // --- inferDistanceFromLaps ---
 
 describe("inferDistanceFromLaps", () => {
-  it("returns null with fewer than 3 laps", () => {
+  it("returns [] with fewer than 3 laps", () => {
     expect(inferDistanceFromLaps([
       { distance: 400, elapsed_time: 90 },
       { distance: 400, elapsed_time: 90 },
-    ])).toBeNull();
+    ])).toEqual([]);
   });
 
   it("detects 400m intervals with recovery laps", () => {
-    // 3x400m with 200m recovery jogs (slower pace)
     const laps = [
-      { distance: 400, elapsed_time: 85 },   // work - fast
-      { distance: 200, elapsed_time: 120 },   // recovery - slow
-      { distance: 400, elapsed_time: 87 },   // work
-      { distance: 200, elapsed_time: 115 },   // recovery
-      { distance: 400, elapsed_time: 84 },   // work
+      { distance: 400, elapsed_time: 85 },
+      { distance: 200, elapsed_time: 120 },
+      { distance: 400, elapsed_time: 87 },
+      { distance: 200, elapsed_time: 115 },
+      { distance: 400, elapsed_time: 84 },
     ];
-    const result = inferDistanceFromLaps(laps);
-    expect(result).toEqual({ distance: 400, count: 3 });
+    expect(inferDistanceFromLaps(laps)).toEqual([{ distance: 400, count: 3 }]);
   });
 
   it("detects 800m intervals with recovery", () => {
@@ -93,23 +96,21 @@ describe("inferDistanceFromLaps", () => {
       { distance: 400, elapsed_time: 290 },
       { distance: 800, elapsed_time: 182 },
     ];
-    const result = inferDistanceFromLaps(laps);
-    expect(result).toEqual({ distance: 800, count: 3 });
+    expect(inferDistanceFromLaps(laps)).toEqual([{ distance: 800, count: 3 }]);
   });
 
-  it("returns null for steady-pace laps (no interval pattern)", () => {
-    // All laps same distance and similar pace — not intervals
+  it("returns [] for steady-pace laps (no interval pattern)", () => {
     const laps = [
       { distance: 1000, elapsed_time: 300 },
       { distance: 1000, elapsed_time: 305 },
       { distance: 1000, elapsed_time: 298 },
       { distance: 1000, elapsed_time: 302 },
     ];
-    expect(inferDistanceFromLaps(laps)).toBeNull();
+    expect(inferDistanceFromLaps(laps)).toEqual([]);
   });
 
-  it("returns null for empty laps", () => {
-    expect(inferDistanceFromLaps([])).toBeNull();
+  it("returns [] for empty laps", () => {
+    expect(inferDistanceFromLaps([])).toEqual([]);
   });
 });
 
@@ -117,17 +118,14 @@ describe("inferDistanceFromLaps", () => {
 
 describe("calculatePace", () => {
   it("calculates pace for 400m in 90s", () => {
-    // 90s / 0.4km = 225s/km = 3:45
     expect(calculatePace(400, 90)).toBe("3:45");
   });
 
   it("calculates pace for 1000m in 240s", () => {
-    // 240s / 1km = 4:00
     expect(calculatePace(1000, 240)).toBe("4:00");
   });
 
   it("calculates pace for 1600m in 360s", () => {
-    // 360s / 1.6km = 225s/km = 3:45
     expect(calculatePace(1600, 360)).toBe("3:45");
   });
 
@@ -161,39 +159,39 @@ function makeActivity(overrides: Partial<DetailedActivity> = {}): DetailedActivi
 }
 
 describe("parseIntervalSession", () => {
-  it("detects intervals from description and computes avg time/pace", () => {
+  it("detects 400m intervals and computes avg time/pace", () => {
     const result = parseIntervalSession(makeActivity());
-    expect(result).not.toBeNull();
-    expect(result!.distance).toBe(400);
-    expect(result!.detected_by).toBe("description");
-    expect(result!.sessionDate).toBe("2024-06-15");
-    expect(result!.avgTime).toBe(88); // avg of 88, 90, 86
-    expect(result!.avgPace).toBe(calculatePace(400, 88));
+    expect(result).toHaveLength(1);
+    expect(result[0].distance).toBe(400);
+    expect(result[0].detected_by).toBe("lap");
+    expect(result[0].sessionDate).toBe("2024-06-15");
+    expect(result[0].avgTime).toBe(88); // avg of 88, 90, 86
+    expect(result[0].avgPace).toBe(calculatePace(400, 88));
   });
 
-  it("falls back to lap inference when description has no pattern", () => {
+  it("detects intervals even when description has no pattern (lap inference)", () => {
     const result = parseIntervalSession(makeActivity({ name: "Track workout", description: null }));
-    expect(result).not.toBeNull();
-    expect(result!.detected_by).toBe("lap");
-    expect(result!.distance).toBe(400);
+    expect(result).toHaveLength(1);
+    expect(result[0].detected_by).toBe("lap");
+    expect(result[0].distance).toBe(400);
   });
 
-  it("returns null with no laps", () => {
-    expect(parseIntervalSession(makeActivity({ laps: undefined }))).toBeNull();
+  it("returns [] with no laps", () => {
+    expect(parseIntervalSession(makeActivity({ laps: undefined }))).toEqual([]);
   });
 
-  it("returns null with only 1 lap", () => {
+  it("returns [] with only 1 lap", () => {
     expect(parseIntervalSession(makeActivity({
       laps: [{ id: 1, name: "Lap 1", elapsed_time: 88, distance: 400, moving_time: 85, start_index: 0, end_index: 1, lap_index: 1 }],
-    }))).toBeNull();
+    }))).toEqual([]);
   });
 
   it("uses start_date_local for sessionDate when available", () => {
     const result = parseIntervalSession(makeActivity({ start_date_local: "2024-06-15T15:30:00" }));
-    expect(result!.sessionDate).toBe("2024-06-15");
+    expect(result[0].sessionDate).toBe("2024-06-15");
   });
 
-  it("returns null for non-interval activity", () => {
+  it("returns [] for non-interval activity", () => {
     const result = parseIntervalSession(makeActivity({
       name: "Easy jog",
       description: null,
@@ -203,88 +201,68 @@ describe("parseIntervalSession", () => {
         { id: 3, name: "Lap 3", elapsed_time: 298, distance: 1000, moving_time: 293, start_index: 2, end_index: 3, lap_index: 3 },
       ],
     }));
-    expect(result).toBeNull();
+    expect(result).toEqual([]);
   });
 });
 
-// --- Ladder interval detection ---
+// --- extractDescriptionHints - ladder patterns ---
 
-describe("parseDescriptionForIntervals - ladder patterns", () => {
-  it("parses '200-400-800m' ascending ladder", () => {
-    const result = parseDescriptionForIntervals("200-400-800m ladder", null);
-    expect(result).toEqual([
-      { distance: 200, count: 1 },
-      { distance: 400, count: 1 },
-      { distance: 800, count: 1 },
-    ]);
+describe("extractDescriptionHints - ladder patterns", () => {
+  it("extracts '200-400-800m' ascending ladder", () => {
+    const result = extractDescriptionHints("200-400-800m ladder", null);
+    expect(result).toEqual(expect.arrayContaining([200, 400, 800]));
+    expect(result).toHaveLength(3);
   });
 
-  it("parses '800-400-200m' descending ladder", () => {
-    const result = parseDescriptionForIntervals("800-400-200m", null);
-    expect(result).toEqual([
-      { distance: 800, count: 1 },
-      { distance: 400, count: 1 },
-      { distance: 200, count: 1 },
-    ]);
+  it("extracts '800-400-200m' descending ladder", () => {
+    const result = extractDescriptionHints("800-400-200m", null);
+    expect(result).toEqual(expect.arrayContaining([800, 400, 200]));
+    expect(result).toHaveLength(3);
   });
 
-  it("parses ladder from description when name has no pattern", () => {
-    const result = parseDescriptionForIntervals("Track session", "200-400-800-400-200m pyramid");
-    expect(result).toEqual([
-      { distance: 200, count: 1 },
-      { distance: 400, count: 1 },
-      { distance: 800, count: 1 },
-      { distance: 400, count: 1 },
-      { distance: 200, count: 1 },
-    ]);
+  it("extracts ladder from description when name has no pattern", () => {
+    const result = extractDescriptionHints("Track session", "200-400-800-400-200m pyramid");
+    // Set deduplicates: [200, 400, 800]
+    expect(result).toEqual(expect.arrayContaining([200, 400, 800]));
+    expect(result).toHaveLength(3);
   });
 
-  it("detects ladder when 'ladder' keyword is in name", () => {
-    const result = parseDescriptionForIntervals("Ladder workout", "200, 400, 800, 1200m");
-    expect(result).toEqual([
-      { distance: 200, count: 1 },
-      { distance: 400, count: 1 },
-      { distance: 800, count: 1 },
-      { distance: 1200, count: 1 },
-    ]);
+  it("extracts ladder when 'ladder' keyword is in name", () => {
+    const result = extractDescriptionHints("Ladder workout", "200, 400, 800, 1200m");
+    expect(result).toEqual(expect.arrayContaining([200, 400, 800, 1200]));
+    expect(result).toHaveLength(4);
   });
 
-  it("ignores ladder-like sequences with unsupported distances", () => {
-    // 300m is not a valid interval distance
-    expect(parseDescriptionForIntervals("300-600-900m", null)).toBeNull();
+  it("returns [] for ladder-like sequences with unsupported distances", () => {
+    expect(extractDescriptionHints("300-600-900m", null)).toEqual([]);
   });
 
-  it("does not treat '5x400m' as a ladder", () => {
-    const result = parseDescriptionForIntervals("5x400m intervals", null);
-    expect(result).toEqual({ distance: 400, count: 5 });
+  it("extracts single distance from '5x400m' (not a ladder)", () => {
+    expect(extractDescriptionHints("5x400m intervals", null)).toEqual([400]);
   });
 });
 
-// --- New: asterisk separator and reversed pattern ---
+// --- extractDescriptionHints - asterisk and reversed patterns ---
 
-describe("parseDescriptionForIntervals - asterisk and reversed patterns", () => {
-  it("parses '4*100m strides' (asterisk separator)", () => {
-    expect(parseDescriptionForIntervals("Warmup + 4*100m strides", null))
-      .toEqual({ distance: 100, count: 4 });
+describe("extractDescriptionHints - asterisk and reversed patterns", () => {
+  it("extracts '4*100m strides' (asterisk separator)", () => {
+    expect(extractDescriptionHints("Warmup + 4*100m strides", null)).toEqual([100]);
   });
 
-  it("parses '400m x 5' (reversed pattern)", () => {
-    expect(parseDescriptionForIntervals("400m x 5", null))
-      .toEqual({ distance: 400, count: 5 });
+  it("extracts '400m x 5' (reversed pattern)", () => {
+    expect(extractDescriptionHints("400m x 5", null)).toEqual([400]);
   });
 
-  it("parses '800m * 3' (reversed with asterisk)", () => {
-    expect(parseDescriptionForIntervals("800m * 3", null))
-      .toEqual({ distance: 800, count: 3 });
+  it("extracts '800m * 3' (reversed with asterisk)", () => {
+    expect(extractDescriptionHints("800m * 3", null)).toEqual([800]);
   });
 
-  it("parses '5*400m' (normal with asterisk)", () => {
-    expect(parseDescriptionForIntervals("5*400m", null))
-      .toEqual({ distance: 400, count: 5 });
+  it("extracts '5*400m' (normal with asterisk)", () => {
+    expect(extractDescriptionHints("5*400m", null)).toEqual([400]);
   });
 });
 
-// --- 100m stride detection ---
+// --- Tempo run filtering ---
 
 describe("parseIntervalSession - tempo run filtering", () => {
   function makeTempoActivity(name: string, laps: Array<{ distance: number; elapsed_time: number }>): DetailedActivity {
@@ -312,51 +290,52 @@ describe("parseIntervalSession - tempo run filtering", () => {
   }
 
   it("does NOT detect 1000m tempo laps as intervals on a tempo run", () => {
-    // 10 consistent 1000m laps — classic tempo run
     const laps = Array.from({ length: 10 }, () => ({ distance: 1000, elapsed_time: 340 }));
-    const activity = makeTempoActivity("Tempo Run", laps);
-    expect(parseIntervalSession(activity)).toBeNull();
+    expect(parseIntervalSession(makeTempoActivity("Tempo Run", laps))).toEqual([]);
   });
 
   it("DOES detect 100m strides embedded in a tempo run", () => {
     const laps = [
-      { distance: 1000, elapsed_time: 420 }, // warmup
-      { distance: 100,  elapsed_time: 26 },  // stride
-      { distance: 20,   elapsed_time: 29 },  // recovery gap
-      { distance: 100,  elapsed_time: 25 },  // stride
+      { distance: 1000, elapsed_time: 420 },
+      { distance: 100,  elapsed_time: 26 },
       { distance: 20,   elapsed_time: 29 },
-      { distance: 100,  elapsed_time: 26 },  // stride
+      { distance: 100,  elapsed_time: 25 },
+      { distance: 20,   elapsed_time: 29 },
+      { distance: 100,  elapsed_time: 26 },
     ];
-    const activity = makeTempoActivity("Tempo Run with strides", laps);
-    const result = parseIntervalSession(activity);
-    expect(result).not.toBeNull();
-    expect((result as ParsedInterval).distance).toBe(100);
+    const result = parseIntervalSession(makeTempoActivity("Tempo Run with strides", laps));
+    expect(result).toHaveLength(1);
+    expect(result[0].distance).toBe(100);
   });
 
-  it("still detects description-parsed intervals on a tempo run (e.g. Tempo + 5x400m)", () => {
-    const activity = makeTempoActivity("Tempo + 5x400m", [
-      { distance: 400, elapsed_time: 88 },
-      { distance: 200, elapsed_time: 120 },
-      { distance: 400, elapsed_time: 90 },
-      { distance: 200, elapsed_time: 115 },
-      { distance: 400, elapsed_time: 86 },
-    ]);
+  it("detects description-hinted intervals on a tempo run (e.g. Tempo + 5x400m)", () => {
+    // The description hints 400m → the tempo guard keeps it even though it's lap-inferred
+    const activity: DetailedActivity = {
+      ...makeTempoActivity("Tempo + 5x400m", [
+        { distance: 400, elapsed_time: 88 },
+        { distance: 200, elapsed_time: 120 },
+        { distance: 400, elapsed_time: 90 },
+        { distance: 200, elapsed_time: 115 },
+        { distance: 400, elapsed_time: 86 },
+      ]),
+      description: null,
+    };
     const result = parseIntervalSession(activity);
-    expect(result).not.toBeNull();
-    expect((result as ParsedInterval).distance).toBe(400);
-    expect((result as ParsedInterval).detected_by).toBe("description");
+    expect(result).toHaveLength(1);
+    expect(result[0].distance).toBe(400);
+    expect(result[0].detected_by).toBe("lap");
   });
 });
 
+// --- 100m stride detection ---
+
 describe("inferDistanceFromLaps - 100m strides", () => {
-  // Helper to build a stride lap set: strideCount fast 100m laps,
-  // each followed by a tiny 20m standing pause.
   function makeStrideLaps(strideCount: number, warmupLaps: Array<{ distance: number; elapsed_time: number }> = []) {
     const laps: Array<{ distance: number; elapsed_time: number }> = [...warmupLaps];
     for (let i = 0; i < strideCount; i++) {
-      laps.push({ distance: 100, elapsed_time: 26 }); // fast stride ~0.26 sec/m
+      laps.push({ distance: 100, elapsed_time: 26 });
       if (i < strideCount - 1) {
-        laps.push({ distance: 20, elapsed_time: 29 }); // standing pause (GPS artifact)
+        laps.push({ distance: 20, elapsed_time: 29 });
       }
     }
     return laps;
@@ -364,49 +343,57 @@ describe("inferDistanceFromLaps - 100m strides", () => {
 
   it("detects 4x100m strides after a warmup lap", () => {
     const laps = makeStrideLaps(4, [{ distance: 1000, elapsed_time: 430 }]);
-    const result = inferDistanceFromLaps(laps);
-    expect(result).toEqual({ distance: 100, count: 4 });
+    expect(inferDistanceFromLaps(laps)).toEqual([{ distance: 100, count: 4 }]);
   });
 
   it("detects 3x100m strides with no warmup", () => {
-    const laps = makeStrideLaps(3);
-    const result = inferDistanceFromLaps(laps);
-    expect(result).toEqual({ distance: 100, count: 3 });
+    expect(inferDistanceFromLaps(makeStrideLaps(3))).toEqual([{ distance: 100, count: 3 }]);
   });
 
   it("does NOT detect strides when long laps heavily outnumber 100m laps (tempo run GPS artifacts)", () => {
-    // Simulate a tempo run: 10x1000m tempo laps with 3 fast 100m GPS artifact laps in between
     const laps: Array<{ distance: number; elapsed_time: number }> = [];
-    // 3 slow 1000m warmup
     for (let i = 0; i < 3; i++) laps.push({ distance: 1000, elapsed_time: 420 });
-    // GPS transition artifacts: 1 slow 100m + 3 fast 100m
-    laps.push({ distance: 100, elapsed_time: 71 }); // slow
+    laps.push({ distance: 100, elapsed_time: 71 });
     laps.push({ distance: 20, elapsed_time: 29 });
-    laps.push({ distance: 100, elapsed_time: 27 }); // fast
+    laps.push({ distance: 100, elapsed_time: 27 });
     laps.push({ distance: 20, elapsed_time: 29 });
-    laps.push({ distance: 100, elapsed_time: 26 }); // fast
+    laps.push({ distance: 100, elapsed_time: 26 });
     laps.push({ distance: 20, elapsed_time: 29 });
-    laps.push({ distance: 100, elapsed_time: 25 }); // fast
-    // 7 fast 1000m tempo laps
+    laps.push({ distance: 100, elapsed_time: 25 });
     for (let i = 0; i < 7; i++) laps.push({ distance: 1000, elapsed_time: 335 });
-    // 1 slow 1000m cooldown
     laps.push({ distance: 1000, elapsed_time: 450 });
-    // 11 long laps total (>300m), 3 fast 100m strides → strides < longLaps → blocked
-    expect(inferDistanceFromLaps(laps)).toBeNull();
+    expect(inferDistanceFromLaps(laps)).toEqual([]);
+  });
+
+  it("detects strides alongside interval work when description hints 100m", () => {
+    // 3x400m intervals + 4x100m strides; the hint for 100 bypasses the longLapCount guard
+    const laps: Array<{ distance: number; elapsed_time: number }> = [
+      { distance: 400, elapsed_time: 85 }, { distance: 200, elapsed_time: 120 },
+      { distance: 400, elapsed_time: 87 }, { distance: 200, elapsed_time: 118 },
+      { distance: 400, elapsed_time: 84 }, { distance: 200, elapsed_time: 122 },
+      { distance: 100, elapsed_time: 26 }, { distance: 20, elapsed_time: 29 },
+      { distance: 100, elapsed_time: 25 }, { distance: 20, elapsed_time: 29 },
+      { distance: 100, elapsed_time: 26 }, { distance: 20, elapsed_time: 29 },
+      { distance: 100, elapsed_time: 27 },
+    ];
+    const result = inferDistanceFromLaps(laps, [100, 400]);
+    const distances = result.map(r => r.distance).sort((a, b) => a - b);
+    expect(distances).toEqual([100, 400]);
   });
 });
+
+// --- Ladder detection ---
 
 describe("inferDistanceFromLaps - ladder patterns", () => {
   it("detects ascending ladder 200-400-800 with recovery laps", () => {
     const laps = [
-      { distance: 200, elapsed_time: 38 },   // work
-      { distance: 200, elapsed_time: 120 },   // recovery (slow)
-      { distance: 400, elapsed_time: 80 },    // work
-      { distance: 200, elapsed_time: 120 },   // recovery
-      { distance: 800, elapsed_time: 170 },   // work
+      { distance: 200, elapsed_time: 38 },
+      { distance: 200, elapsed_time: 120 },
+      { distance: 400, elapsed_time: 80 },
+      { distance: 200, elapsed_time: 120 },
+      { distance: 800, elapsed_time: 170 },
     ];
-    const result = inferDistanceFromLaps(laps);
-    expect(result).toEqual([
+    expect(inferDistanceFromLaps(laps)).toEqual([
       { distance: 200, count: 1 },
       { distance: 400, count: 1 },
       { distance: 800, count: 1 },
@@ -421,22 +408,21 @@ describe("inferDistanceFromLaps - ladder patterns", () => {
       { distance: 200, elapsed_time: 120 },
       { distance: 200, elapsed_time: 38 },
     ];
-    const result = inferDistanceFromLaps(laps);
-    expect(result).toEqual([
+    expect(inferDistanceFromLaps(laps)).toEqual([
       { distance: 800, count: 1 },
       { distance: 400, count: 1 },
       { distance: 200, count: 1 },
     ]);
   });
 
-  it("does not detect ladder from steady tempo laps", () => {
+  it("returns [] for steady tempo laps", () => {
     const laps = [
       { distance: 1000, elapsed_time: 270 },
       { distance: 1000, elapsed_time: 265 },
       { distance: 1000, elapsed_time: 260 },
       { distance: 1000, elapsed_time: 255 },
     ];
-    expect(inferDistanceFromLaps(laps)).toBeNull();
+    expect(inferDistanceFromLaps(laps)).toEqual([]);
   });
 
   it("still detects normal same-distance intervals (not ladder)", () => {
@@ -447,12 +433,14 @@ describe("inferDistanceFromLaps - ladder patterns", () => {
       { distance: 200, elapsed_time: 115 },
       { distance: 400, elapsed_time: 84 },
     ];
-    expect(inferDistanceFromLaps(laps)).toEqual({ distance: 400, count: 3 });
+    expect(inferDistanceFromLaps(laps)).toEqual([{ distance: 400, count: 3 }]);
   });
 });
 
+// --- Ladder workouts end-to-end ---
+
 describe("parseIntervalSession - ladder workouts", () => {
-  it("returns array of ParsedIntervals for ladder described in name", () => {
+  it("returns array of ParsedIntervals for a 200-400-800m ladder", () => {
     const activity: DetailedActivity = {
       id: 100,
       name: "200-400-800m ladder",
@@ -464,33 +452,80 @@ describe("parseIntervalSession - ladder workouts", () => {
       type: "Run",
       sport_type: "Run",
       laps: [
-        { id: 1, name: "Lap 1", elapsed_time: 38, distance: 200, moving_time: 36, start_index: 0, end_index: 1, lap_index: 1 },
+        { id: 1, name: "Lap 1", elapsed_time: 38,  distance: 200, moving_time: 36,  start_index: 0, end_index: 1, lap_index: 1 },
         { id: 2, name: "Lap 2", elapsed_time: 120, distance: 200, moving_time: 115, start_index: 1, end_index: 2, lap_index: 2 },
-        { id: 3, name: "Lap 3", elapsed_time: 80, distance: 400, moving_time: 78, start_index: 2, end_index: 3, lap_index: 3 },
+        { id: 3, name: "Lap 3", elapsed_time: 80,  distance: 400, moving_time: 78,  start_index: 2, end_index: 3, lap_index: 3 },
         { id: 4, name: "Lap 4", elapsed_time: 120, distance: 200, moving_time: 115, start_index: 3, end_index: 4, lap_index: 4 },
         { id: 5, name: "Lap 5", elapsed_time: 170, distance: 800, moving_time: 165, start_index: 4, end_index: 5, lap_index: 5 },
       ],
     };
     const result = parseIntervalSession(activity);
-    expect(Array.isArray(result)).toBe(true);
-    const arr = result as ParsedInterval[];
-    expect(arr).toHaveLength(3);
-    expect(arr[0].distance).toBe(200);
-    expect(arr[0].avgTime).toBe(38);
-    expect(arr[0].detected_by).toBe("description");
-    expect(arr[1].distance).toBe(400);
-    expect(arr[1].avgTime).toBe(80);
-    expect(arr[2].distance).toBe(800);
-    expect(arr[2].avgTime).toBe(170);
-    // All share same session metadata
-    expect(arr.every(i => i.sessionId === 100)).toBe(true);
-    expect(arr.every(i => i.sessionDate === "2024-07-01")).toBe(true);
+    expect(result).toHaveLength(3);
+    // Each distance uses the fastest matching lap (count:1)
+    const r200 = result.find(r => r.distance === 200)!;
+    const r400 = result.find(r => r.distance === 400)!;
+    const r800 = result.find(r => r.distance === 800)!;
+    expect(r200.avgTime).toBe(38);   // fastest 200m lap, not the 120s recovery ones
+    expect(r400.avgTime).toBe(80);
+    expect(r800.avgTime).toBe(170);
+    expect(result.every(i => i.sessionId === 100)).toBe(true);
+    expect(result.every(i => i.sessionDate === "2024-07-01")).toBe(true);
+    expect(result.every(i => i.detected_by === "lap")).toBe(true);
   });
 
-  it("still returns single ParsedInterval for normal same-distance intervals", () => {
+  it("returns single-element array for normal same-distance intervals", () => {
     const result = parseIntervalSession(makeActivity());
-    expect(result).not.toBeNull();
-    expect(Array.isArray(result)).toBe(false);
-    expect((result as ParsedInterval).distance).toBe(400);
+    expect(result).toHaveLength(1);
+    expect(result[0].distance).toBe(400);
+  });
+});
+
+// --- Multi-distance activity ---
+
+describe("parseIntervalSession - multi-distance activity", () => {
+  it("returns both 100m strides and 400m intervals from same activity", () => {
+    // 3x400m with 200m recovery + 4x100m strides with 20m GPS pauses
+    const activity: DetailedActivity = {
+      id: 200,
+      name: "Intervals",
+      description: "4 * 100m strides + 3 * 400m",
+      distance: 5000,
+      moving_time: 1200,
+      elapsed_time: 1500,
+      start_date: "2026-01-06T07:00:00Z",
+      type: "Run",
+      sport_type: "Run",
+      laps: [
+        // 3x400m intervals with 200m recovery
+        { id: 1,  name: "Lap 1",  elapsed_time: 85,  distance: 400, moving_time: 83,  start_index: 0,  end_index: 1,  lap_index: 1 },
+        { id: 2,  name: "Lap 2",  elapsed_time: 120, distance: 200, moving_time: 118, start_index: 1,  end_index: 2,  lap_index: 2 },
+        { id: 3,  name: "Lap 3",  elapsed_time: 87,  distance: 400, moving_time: 85,  start_index: 2,  end_index: 3,  lap_index: 3 },
+        { id: 4,  name: "Lap 4",  elapsed_time: 118, distance: 200, moving_time: 116, start_index: 3,  end_index: 4,  lap_index: 4 },
+        { id: 5,  name: "Lap 5",  elapsed_time: 84,  distance: 400, moving_time: 82,  start_index: 4,  end_index: 5,  lap_index: 5 },
+        { id: 6,  name: "Lap 6",  elapsed_time: 122, distance: 200, moving_time: 120, start_index: 5,  end_index: 6,  lap_index: 6 },
+        // 4x100m strides with 20m GPS pauses between them
+        { id: 7,  name: "Lap 7",  elapsed_time: 26,  distance: 100, moving_time: 25,  start_index: 6,  end_index: 7,  lap_index: 7 },
+        { id: 8,  name: "Lap 8",  elapsed_time: 29,  distance: 20,  moving_time: 28,  start_index: 7,  end_index: 8,  lap_index: 8 },
+        { id: 9,  name: "Lap 9",  elapsed_time: 25,  distance: 100, moving_time: 24,  start_index: 8,  end_index: 9,  lap_index: 9 },
+        { id: 10, name: "Lap 10", elapsed_time: 29,  distance: 20,  moving_time: 28,  start_index: 9,  end_index: 10, lap_index: 10 },
+        { id: 11, name: "Lap 11", elapsed_time: 26,  distance: 100, moving_time: 25,  start_index: 10, end_index: 11, lap_index: 11 },
+        { id: 12, name: "Lap 12", elapsed_time: 29,  distance: 20,  moving_time: 28,  start_index: 11, end_index: 12, lap_index: 12 },
+        { id: 13, name: "Lap 13", elapsed_time: 27,  distance: 100, moving_time: 26,  start_index: 12, end_index: 13, lap_index: 13 },
+      ],
+    };
+
+    const result = parseIntervalSession(activity);
+    expect(result).toHaveLength(2);
+
+    const distances = result.map(r => r.distance).sort((a, b) => a - b);
+    expect(distances).toEqual([100, 400]);
+
+    const r400 = result.find(r => r.distance === 400)!;
+    const r100 = result.find(r => r.distance === 100)!;
+
+    expect(r400.avgTime).toBe(85); // avg of 85, 87, 84 = 85.3 → 85
+    expect(r100.avgTime).toBe(26); // avg of 26, 25, 26, 27 = 26
+    expect(result.every(r => r.detected_by === "lap")).toBe(true);
+    expect(result.every(r => r.sessionDate === "2026-01-06")).toBe(true);
   });
 });
