@@ -76,7 +76,7 @@ describe("POST /api/dashboard", () => {
   it("returns parsed intervals and daily averages", async () => {
     mockGetServerSession.mockResolvedValue({ accessToken: "tok" } as any);
     mockFetchActivities.mockResolvedValue([
-      { id: 1, name: "5x400m intervals", description: "5x400m", workout_type: 3 },
+      { id: 1, name: "5x400m intervals", description: "5x400m", workout_type: 3, type: "Run", sport_type: "Run" },
     ]);
     mockFetchDetailed.mockResolvedValue({} as any);
     mockParseInterval.mockReturnValue({
@@ -104,8 +104,8 @@ describe("POST /api/dashboard", () => {
   it("filters intervals by requested distance", async () => {
     mockGetServerSession.mockResolvedValue({ accessToken: "tok" } as any);
     mockFetchActivities.mockResolvedValue([
-      { id: 1, name: "5x400m", workout_type: 3 },
-      { id: 2, name: "3x800m", workout_type: 3 },
+      { id: 1, name: "5x400m", workout_type: 3, type: "Run", sport_type: "Run" },
+      { id: 2, name: "3x800m", workout_type: 3, type: "Run", sport_type: "Run" },
     ]);
     mockFetchDetailed.mockResolvedValue({} as any);
     mockParseInterval
@@ -122,8 +122,8 @@ describe("POST /api/dashboard", () => {
   it("groups multiple sessions on same date into daily averages", async () => {
     mockGetServerSession.mockResolvedValue({ accessToken: "tok" } as any);
     mockFetchActivities.mockResolvedValue([
-      { id: 1, name: "5x400m AM", workout_type: 3 },
-      { id: 2, name: "5x400m PM", workout_type: 3 },
+      { id: 1, name: "5x400m AM", workout_type: 3, type: "Run", sport_type: "Run" },
+      { id: 2, name: "5x400m PM", workout_type: 3, type: "Run", sport_type: "Run" },
     ]);
     mockFetchDetailed.mockResolvedValue({} as any);
     mockParseInterval
@@ -138,18 +138,18 @@ describe("POST /api/dashboard", () => {
     expect(data.dailyAverages[0].sessions).toHaveLength(2);
   });
 
-  it("pre-filters activities by interval keywords", async () => {
+  it("only fetches details for Run activities", async () => {
     mockGetServerSession.mockResolvedValue({ accessToken: "tok" } as any);
     mockFetchActivities.mockResolvedValue([
-      { id: 1, name: "Easy jog", description: "Recovery", workout_type: 0 },
-      { id: 2, name: "5x400m intervals", description: "", workout_type: 0 },
+      { id: 1, name: "Easy jog", type: "Run", sport_type: "Run" },
+      { id: 2, name: "Bike ride", type: "Ride", sport_type: "Ride" },
     ]);
     mockFetchDetailed.mockResolvedValue({} as any);
     mockParseInterval.mockReturnValue(null);
 
     await POST(makeRequest({ startDate: "2024-01-01", endDate: "2024-02-01" }));
 
-    // Only the interval activity should have fetchDetailedActivity called
+    // Only the Run activity should have fetchDetailedActivity called
     expect(mockFetchDetailed).toHaveBeenCalledTimes(1);
   });
 

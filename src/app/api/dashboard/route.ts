@@ -54,19 +54,12 @@ export async function POST(request: NextRequest) {
     );
     console.log("✅ [Dashboard API] Fetched", activities.length, "activities");
 
-    // Pre-filter: only fetch details for activities likely to be intervals
-    // - workout_type 3 = "Workout" in Strava (includes intervals)
-    // - name/description contains interval patterns (5x400m, 5x1min, etc.)
-    // - name/description contains common interval keywords
-    const intervalKeywords = /interval|repeat|rep|fartlek|speed\s*work|track/i;
-    const intervalPattern = /\d+\s*[x×]\s*\d+\s*(?:m|meter|min|k\b)/i;
-
-    const candidates = activities.filter((activity: any) => {
-      if (activity.workout_type === 3) return true;
-      const text = `${activity.name || ""} ${activity.description || ""}`;
-      return intervalKeywords.test(text) || intervalPattern.test(text);
-    });
-    console.log("🎯 [Dashboard API] Filtered to", candidates.length, "candidates from", activities.length, "activities");
+    // Fetch details for all Run activities — the lap-based detection
+    // needs full lap data and can't be pre-filtered by keywords alone.
+    const candidates = activities.filter((a: any) =>
+      a.type === "Run" || a.sport_type === "Run"
+    );
+    console.log("🎯 [Dashboard API]", candidates.length, "runs from", activities.length, "activities");
 
     // Parse intervals from activities - fetch details in parallel (5 at a time)
     const CONCURRENCY = 5;

@@ -1,0 +1,5232 @@
+{
+  "summary": {
+    "totalRuns": 30,
+    "detectedIntervals": 7,
+    "missedByPreFilter": 4,
+    "potentialMissedIntervals": 19
+  },
+  "detected": [
+    {
+      "id": 16772882205,
+      "date": "2025-12-18",
+      "name": "Tempo run",
+      "description": null,
+      "workout_type": 0,
+      "total_distance": 10502,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": {
+        "sessionId": 16772882205,
+        "sessionDate": "2025-12-18",
+        "activityName": "Tempo run",
+        "distance": 1000,
+        "avgTime": 380,
+        "avgPace": "6:20",
+        "detected_by": "lap"
+      },
+      "lapCount": 19,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 419,
+          "pace": 419
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 409,
+          "pace": 409
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 418,
+          "pace": 418
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 48,
+          "pace": 480
+        },
+        {
+          "distance": 22,
+          "elapsed_time": 29,
+          "pace": 1335.8
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 17,
+          "elapsed_time": 29,
+          "pace": 1742.8
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 27,
+          "pace": 270
+        },
+        {
+          "distance": 26,
+          "elapsed_time": 29,
+          "pace": 1128.8
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 28,
+          "pace": 280
+        },
+        {
+          "distance": 28,
+          "elapsed_time": 30,
+          "pace": 1072.2
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 337,
+          "pace": 337
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 338,
+          "pace": 338
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 337,
+          "pace": 337
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 334,
+          "pace": 334
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 325,
+          "pace": 325
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 427,
+          "pace": 427
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 452,
+          "pace": 452
+        },
+        {
+          "distance": 10,
+          "elapsed_time": 4,
+          "pace": 395.3
+        }
+      ]
+    },
+    {
+      "id": 16879717160,
+      "date": "2025-12-30",
+      "name": "Intervals",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 11058,
+      "passesPreFilter": true,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": {
+        "sessionId": 16879717160,
+        "sessionDate": "2025-12-30",
+        "activityName": "Intervals",
+        "distance": 1000,
+        "avgTime": 427,
+        "avgPace": "7:07",
+        "detected_by": "lap"
+      },
+      "lapCount": 32,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 411,
+          "pace": 411
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 91,
+          "pace": 910
+        },
+        {
+          "distance": 20,
+          "elapsed_time": 29,
+          "pace": 1486.4
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 28,
+          "pace": 280
+        },
+        {
+          "distance": 19,
+          "elapsed_time": 29,
+          "pace": 1563.3
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 19,
+          "elapsed_time": 29,
+          "pace": 1536
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 27,
+          "pace": 270
+        },
+        {
+          "distance": 31,
+          "elapsed_time": 88,
+          "pace": 2859
+        },
+        {
+          "distance": 800,
+          "elapsed_time": 251,
+          "pace": 313.8
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 95,
+          "pace": 475
+        },
+        {
+          "distance": 800,
+          "elapsed_time": 251,
+          "pace": 313.8
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 107,
+          "pace": 535
+        },
+        {
+          "distance": 800,
+          "elapsed_time": 250,
+          "pace": 312.5
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 120,
+          "pace": 600
+        },
+        {
+          "distance": 800,
+          "elapsed_time": 251,
+          "pace": 313.8
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 130,
+          "pace": 650
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 120,
+          "pace": 300
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 120,
+          "pace": 600
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 120,
+          "pace": 300
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 147,
+          "pace": 735
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 119,
+          "pace": 297.5
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 122,
+          "pace": 610
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 119,
+          "pace": 297.5
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 139,
+          "pace": 695
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 114,
+          "pace": 285
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 133,
+          "pace": 665
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 112,
+          "pace": 280
+        },
+        {
+          "distance": 61,
+          "elapsed_time": 41,
+          "pace": 675.7
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 466,
+          "pace": 466
+        },
+        {
+          "distance": 109,
+          "elapsed_time": 44,
+          "pace": 401.9
+        }
+      ]
+    },
+    {
+      "id": 16951803474,
+      "date": "2026-01-06",
+      "name": "Intervals",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 10161,
+      "passesPreFilter": true,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": {
+        "sessionId": 16951803474,
+        "sessionDate": "2026-01-06",
+        "activityName": "Intervals",
+        "distance": 400,
+        "avgTime": 111,
+        "avgPace": "4:38",
+        "detected_by": "lap"
+      },
+      "lapCount": 35,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 459,
+          "pace": 459
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 401,
+          "pace": 401
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 70,
+          "pace": 700
+        },
+        {
+          "distance": 15,
+          "elapsed_time": 29,
+          "pace": 1895.4
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 26,
+          "pace": 260
+        },
+        {
+          "distance": 25,
+          "elapsed_time": 29,
+          "pace": 1168.9
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 24,
+          "pace": 240
+        },
+        {
+          "distance": 23,
+          "elapsed_time": 29,
+          "pace": 1244.6
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 33,
+          "elapsed_time": 132,
+          "pace": 4000
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 116,
+          "pace": 290
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 142,
+          "pace": 710
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 116,
+          "pace": 290
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 161,
+          "pace": 805
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 114,
+          "pace": 285
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 156,
+          "pace": 780
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 116,
+          "pace": 290
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 141,
+          "pace": 705
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 112,
+          "pace": 280
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 148,
+          "pace": 740
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 111,
+          "pace": 277.5
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 155,
+          "pace": 775
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 109,
+          "pace": 272.5
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 160,
+          "pace": 800
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 108,
+          "pace": 270
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 153,
+          "pace": 765
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 108,
+          "pace": 270
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 166,
+          "pace": 830
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 106,
+          "pace": 265
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 163,
+          "pace": 815
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 108,
+          "pace": 270
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 156,
+          "pace": 780
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 102,
+          "pace": 255
+        },
+        {
+          "distance": 56,
+          "elapsed_time": 48,
+          "pace": 857.8
+        },
+        {
+          "distance": 609,
+          "elapsed_time": 349,
+          "pace": 573.4
+        }
+      ]
+    },
+    {
+      "id": 17212385058,
+      "date": "2026-01-29",
+      "name": "Warmup + 4*100m strides",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 1882,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": [
+        {
+          "sessionId": 17212385058,
+          "sessionDate": "2026-01-29",
+          "activityName": "Warmup + 4*100m strides",
+          "distance": 1000,
+          "avgTime": 432,
+          "avgPace": "7:12",
+          "detected_by": "lap"
+        },
+        {
+          "sessionId": 17212385058,
+          "sessionDate": "2026-01-29",
+          "activityName": "Warmup + 4*100m strides",
+          "distance": 400,
+          "avgTime": 167,
+          "avgPace": "6:57",
+          "detected_by": "lap"
+        }
+      ],
+      "lapCount": 10,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 432,
+          "pace": 432
+        },
+        {
+          "distance": 401,
+          "elapsed_time": 167,
+          "pace": 416
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 72,
+          "pace": 720
+        },
+        {
+          "distance": 21,
+          "elapsed_time": 29,
+          "pace": 1380.3
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 27,
+          "pace": 270
+        },
+        {
+          "distance": 26,
+          "elapsed_time": 29,
+          "pace": 1097.7
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 26,
+          "pace": 260
+        },
+        {
+          "distance": 22,
+          "elapsed_time": 29,
+          "pace": 1335.8
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 26,
+          "pace": 260
+        },
+        {
+          "distance": 12,
+          "elapsed_time": 6,
+          "pace": 521.7
+        }
+      ]
+    },
+    {
+      "id": 17369156298,
+      "date": "2026-02-12",
+      "name": "Tempo Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 10056,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": {
+        "sessionId": 17369156298,
+        "sessionDate": "2026-02-12",
+        "activityName": "Tempo Run",
+        "distance": 1000,
+        "avgTime": 357,
+        "avgPace": "5:57",
+        "detected_by": "lap"
+      },
+      "lapCount": 20,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 408,
+          "pace": 408
+        },
+        {
+          "distance": 473,
+          "elapsed_time": 191,
+          "pace": 404.2
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 64,
+          "pace": 640
+        },
+        {
+          "distance": 21,
+          "elapsed_time": 29,
+          "pace": 1396.2
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 27,
+          "pace": 270
+        },
+        {
+          "distance": 15,
+          "elapsed_time": 29,
+          "pace": 1900.4
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 26,
+          "pace": 260
+        },
+        {
+          "distance": 18,
+          "elapsed_time": 29,
+          "pace": 1575.2
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 24,
+          "elapsed_time": 122,
+          "pace": 5113.2
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 355,
+          "pace": 355
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 350,
+          "pace": 350
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 343,
+          "pace": 343
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 339,
+          "pace": 339
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 338,
+          "pace": 338
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 330,
+          "pace": 330
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 325,
+          "pace": 325
+        },
+        {
+          "distance": 49,
+          "elapsed_time": 16,
+          "pace": 325.4
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 421,
+          "pace": 421
+        },
+        {
+          "distance": 56,
+          "elapsed_time": 22,
+          "pace": 390.2
+        }
+      ]
+    },
+    {
+      "id": 17582963393,
+      "date": "2026-03-03",
+      "name": "Intervals",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 7143,
+      "passesPreFilter": true,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": {
+        "sessionId": 17582963393,
+        "sessionDate": "2026-03-03",
+        "activityName": "Intervals",
+        "distance": -60,
+        "avgTime": 60,
+        "avgPace": "4:41",
+        "avgCoveredDistance": 213,
+        "detected_by": "lap"
+      },
+      "lapCount": 44,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 421,
+          "pace": 421
+        },
+        {
+          "distance": 418,
+          "elapsed_time": 178,
+          "pace": 425.4
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 67,
+          "pace": 670
+        },
+        {
+          "distance": 30,
+          "elapsed_time": 29,
+          "pace": 978.7
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 26,
+          "pace": 260
+        },
+        {
+          "distance": 11,
+          "elapsed_time": 29,
+          "pace": 2655.7
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 24,
+          "elapsed_time": 29,
+          "pace": 1212.9
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 21,
+          "elapsed_time": 29,
+          "pace": 1392.9
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 29,
+          "elapsed_time": 29,
+          "pace": 1008.7
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 28,
+          "pace": 280
+        },
+        {
+          "distance": 24,
+          "elapsed_time": 83,
+          "pace": 3417
+        },
+        {
+          "distance": 217,
+          "elapsed_time": 60,
+          "pace": 276.6
+        },
+        {
+          "distance": 48,
+          "elapsed_time": 75,
+          "pace": 1551.2
+        },
+        {
+          "distance": 219,
+          "elapsed_time": 60,
+          "pace": 274.3
+        },
+        {
+          "distance": 66,
+          "elapsed_time": 75,
+          "pace": 1138.4
+        },
+        {
+          "distance": 222,
+          "elapsed_time": 60,
+          "pace": 270.6
+        },
+        {
+          "distance": 57,
+          "elapsed_time": 75,
+          "pace": 1319
+        },
+        {
+          "distance": 219,
+          "elapsed_time": 60,
+          "pace": 273.8
+        },
+        {
+          "distance": 58,
+          "elapsed_time": 75,
+          "pace": 1287.8
+        },
+        {
+          "distance": 219,
+          "elapsed_time": 60,
+          "pace": 274.2
+        },
+        {
+          "distance": 68,
+          "elapsed_time": 75,
+          "pace": 1100.2
+        },
+        {
+          "distance": 223,
+          "elapsed_time": 60,
+          "pace": 268.7
+        },
+        {
+          "distance": 51,
+          "elapsed_time": 75,
+          "pace": 1470.9
+        },
+        {
+          "distance": 223,
+          "elapsed_time": 60,
+          "pace": 268.8
+        },
+        {
+          "distance": 74,
+          "elapsed_time": 75,
+          "pace": 1007
+        },
+        {
+          "distance": 222,
+          "elapsed_time": 60,
+          "pace": 270
+        },
+        {
+          "distance": 55,
+          "elapsed_time": 75,
+          "pace": 1351.6
+        },
+        {
+          "distance": 224,
+          "elapsed_time": 60,
+          "pace": 268
+        },
+        {
+          "distance": 81,
+          "elapsed_time": 75,
+          "pace": 927.1
+        },
+        {
+          "distance": 225,
+          "elapsed_time": 60,
+          "pace": 266.3
+        },
+        {
+          "distance": 60,
+          "elapsed_time": 75,
+          "pace": 1250
+        },
+        {
+          "distance": 224,
+          "elapsed_time": 60,
+          "pace": 267.4
+        },
+        {
+          "distance": 75,
+          "elapsed_time": 75,
+          "pace": 1004.4
+        },
+        {
+          "distance": 221,
+          "elapsed_time": 60,
+          "pace": 272
+        },
+        {
+          "distance": 41,
+          "elapsed_time": 78,
+          "pace": 1907.1
+        },
+        {
+          "distance": 224,
+          "elapsed_time": 60,
+          "pace": 268.3
+        },
+        {
+          "distance": 83,
+          "elapsed_time": 75,
+          "pace": 899.5
+        },
+        {
+          "distance": 219,
+          "elapsed_time": 60,
+          "pace": 274.6
+        },
+        {
+          "distance": 61,
+          "elapsed_time": 75,
+          "pace": 1231.7
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 424,
+          "pace": 424
+        },
+        {
+          "distance": 9,
+          "elapsed_time": 3,
+          "pace": 340.5
+        }
+      ]
+    },
+    {
+      "id": 17608254764,
+      "date": "2026-03-05",
+      "name": "Tempo Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 9254,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": {
+        "sessionId": 17608254764,
+        "sessionDate": "2026-03-05",
+        "activityName": "Tempo Run",
+        "distance": 1000,
+        "avgTime": 360,
+        "avgPace": "6:00",
+        "detected_by": "lap"
+      },
+      "lapCount": 19,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 409,
+          "pace": 409
+        },
+        {
+          "distance": 474,
+          "elapsed_time": 190,
+          "pace": 401.1
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 71,
+          "pace": 710
+        },
+        {
+          "distance": 18,
+          "elapsed_time": 29,
+          "pace": 1596.9
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 27,
+          "pace": 270
+        },
+        {
+          "distance": 18,
+          "elapsed_time": 29,
+          "pace": 1572.7
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 29,
+          "elapsed_time": 29,
+          "pace": 983.7
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 26,
+          "pace": 260
+        },
+        {
+          "distance": 33,
+          "elapsed_time": 99,
+          "pace": 3024.7
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 335,
+          "pace": 335
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 334,
+          "pace": 334
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 337,
+          "pace": 337
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 340,
+          "pace": 340
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 337,
+          "pace": 337
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 334,
+          "pace": 334
+        },
+        {
+          "distance": 250,
+          "elapsed_time": 80,
+          "pace": 320.5
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 452,
+          "pace": 452
+        },
+        {
+          "distance": 32,
+          "elapsed_time": 13,
+          "pace": 404
+        }
+      ]
+    }
+  ],
+  "potentialMisses": [
+    {
+      "id": 16798311382,
+      "date": "2025-12-21",
+      "name": "PCHM - 2025",
+      "description": null,
+      "workout_type": 1,
+      "total_distance": 21326,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 22,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 358,
+          "pace": 358
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 356,
+          "pace": 356
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 350,
+          "pace": 350
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 352,
+          "pace": 352
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 343,
+          "pace": 343
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 344,
+          "pace": 344
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 348,
+          "pace": 348
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 339,
+          "pace": 339
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 338,
+          "pace": 338
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 346,
+          "pace": 346
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 351,
+          "pace": 351
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 340,
+          "pace": 340
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 332,
+          "pace": 332
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 334,
+          "pace": 334
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 338,
+          "pace": 338
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 344,
+          "pace": 344
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 342,
+          "pace": 342
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 335,
+          "pace": 335
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 325,
+          "pace": 325
+        },
+        {
+          "distance": 326,
+          "elapsed_time": 103,
+          "pace": 316.3
+        }
+      ]
+    },
+    {
+      "id": 16850178719,
+      "date": "2025-12-27",
+      "name": "Morning Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 7004,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 8,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 456,
+          "pace": 456
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 435,
+          "pace": 435
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 489,
+          "pace": 489
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 472,
+          "pace": 472
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 452,
+          "pace": 452
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 457,
+          "pace": 457
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 473,
+          "pace": 473
+        },
+        {
+          "distance": 4,
+          "elapsed_time": 3,
+          "pace": 777.2
+        }
+      ]
+    },
+    {
+      "id": 16860063000,
+      "date": "2025-12-28",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 16312,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 17,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 396,
+          "pace": 396
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 369,
+          "pace": 369
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 381,
+          "pace": 381
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 372,
+          "pace": 372
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 400,
+          "pace": 400
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 369,
+          "pace": 369
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 378,
+          "pace": 378
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 467,
+          "pace": 467
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 364,
+          "pace": 364
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 388,
+          "pace": 388
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 363,
+          "pace": 363
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 366,
+          "pace": 366
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 369,
+          "pace": 369
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 367,
+          "pace": 367
+        },
+        {
+          "distance": 312,
+          "elapsed_time": 108,
+          "pace": 346.4
+        }
+      ]
+    },
+    {
+      "id": 16918799054,
+      "date": "2026-01-03",
+      "name": "Shakeout Run with drills",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 6007,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 7,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 1081,
+          "pace": 1081
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 477,
+          "pace": 477
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 504,
+          "pace": 504
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 507,
+          "pace": 507
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 514,
+          "pace": 514
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 530,
+          "pace": 530
+        },
+        {
+          "distance": 7,
+          "elapsed_time": 3,
+          "pace": 404.3
+        }
+      ]
+    },
+    {
+      "id": 16929955414,
+      "date": "2026-01-04",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 16151,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 17,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 388,
+          "pace": 388
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 366,
+          "pace": 366
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 366,
+          "pace": 366
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 369,
+          "pace": 369
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 367,
+          "pace": 367
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 375,
+          "pace": 375
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 358,
+          "pace": 358
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 361,
+          "pace": 361
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 364,
+          "pace": 364
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 378,
+          "pace": 378
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 364,
+          "pace": 364
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 361,
+          "pace": 361
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 367,
+          "pace": 367
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 357,
+          "pace": 357
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 346,
+          "pace": 346
+        },
+        {
+          "distance": 151,
+          "elapsed_time": 53,
+          "pace": 350.6
+        }
+      ]
+    },
+    {
+      "id": 16979220987,
+      "date": "2026-01-08",
+      "name": "Evening Run - Treadmill run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 5900,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 6,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 424,
+          "pace": 424
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 399,
+          "pace": 399
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 480,
+          "pace": 480
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 409,
+          "pace": 409
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 401,
+          "pace": 401
+        },
+        {
+          "distance": 104,
+          "elapsed_time": 41,
+          "pace": 394.3
+        }
+      ]
+    },
+    {
+      "id": 17007280272,
+      "date": "2026-01-11",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 18020,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 19,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 395,
+          "pace": 395
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 382,
+          "pace": 382
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 368,
+          "pace": 368
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 367,
+          "pace": 367
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 377,
+          "pace": 377
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 365,
+          "pace": 365
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 364,
+          "pace": 364
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 364,
+          "pace": 364
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 363,
+          "pace": 363
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 368,
+          "pace": 368
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 365,
+          "pace": 365
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 363,
+          "pace": 363
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 363,
+          "pace": 363
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 357,
+          "pace": 357
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 357,
+          "pace": 357
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 354,
+          "pace": 354
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 353,
+          "pace": 353
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 331,
+          "pace": 331
+        },
+        {
+          "distance": 20,
+          "elapsed_time": 5,
+          "pace": 250.4
+        }
+      ]
+    },
+    {
+      "id": 17075812268,
+      "date": "2026-01-17",
+      "name": "Saturday Shakeout Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 8008,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 9,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 483,
+          "pace": 483
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 440,
+          "pace": 440
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 495,
+          "pace": 495
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 456,
+          "pace": 456
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 478,
+          "pace": 478
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 445,
+          "pace": 445
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 439,
+          "pace": 439
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 445,
+          "pace": 445
+        },
+        {
+          "distance": 8,
+          "elapsed_time": 8,
+          "pace": 1033.6
+        }
+      ]
+    },
+    {
+      "id": 17087610466,
+      "date": "2026-01-18",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 21158,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 22,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 381,
+          "pace": 381
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 371,
+          "pace": 371
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 366,
+          "pace": 366
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 358,
+          "pace": 358
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 402,
+          "pace": 402
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 351,
+          "pace": 351
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 361,
+          "pace": 361
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 357,
+          "pace": 357
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 366,
+          "pace": 366
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 359,
+          "pace": 359
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 359,
+          "pace": 359
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 354,
+          "pace": 354
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 380,
+          "pace": 380
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 352,
+          "pace": 352
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 354,
+          "pace": 354
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 360,
+          "pace": 360
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 347,
+          "pace": 347
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 346,
+          "pace": 346
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 350,
+          "pace": 350
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 328,
+          "pace": 328
+        },
+        {
+          "distance": 159,
+          "elapsed_time": 51,
+          "pace": 320.1
+        }
+      ]
+    },
+    {
+      "id": 17110619874,
+      "date": "2026-01-20",
+      "name": "Recovery Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 9025,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 10,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 439,
+          "pace": 439
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 415,
+          "pace": 415
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 424,
+          "pace": 424
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 411,
+          "pace": 411
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 401,
+          "pace": 401
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 400,
+          "pace": 400
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 407,
+          "pace": 407
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 402,
+          "pace": 402
+        },
+        {
+          "distance": 26,
+          "elapsed_time": 9,
+          "pace": 351.4
+        }
+      ]
+    },
+    {
+      "id": 17178643249,
+      "date": "2026-01-26",
+      "name": "Morning Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 7023,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 8,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 380,
+          "pace": 380
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 375,
+          "pace": 375
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 381,
+          "pace": 381
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 377,
+          "pace": 377
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 379,
+          "pace": 379
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 375,
+          "pace": 375
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 387,
+          "pace": 387
+        },
+        {
+          "distance": 24,
+          "elapsed_time": 9,
+          "pace": 371.6
+        }
+      ]
+    },
+    {
+      "id": 17212385268,
+      "date": "2026-01-29",
+      "name": "Progressive Tempo Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 8062,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 9,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 370,
+          "pace": 370
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 363,
+          "pace": 363
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 366,
+          "pace": 366
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 356,
+          "pace": 356
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 354,
+          "pace": 354
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 351,
+          "pace": 351
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 346,
+          "pace": 346
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 329,
+          "pace": 329
+        },
+        {
+          "distance": 62,
+          "elapsed_time": 19,
+          "pace": 306.7
+        }
+      ]
+    },
+    {
+      "id": 17323591644,
+      "date": "2026-02-08",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 12013,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 13,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 419,
+          "pace": 419
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 402,
+          "pace": 402
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 415,
+          "pace": 415
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 385,
+          "pace": 385
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 407,
+          "pace": 407
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 395,
+          "pace": 395
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 415,
+          "pace": 415
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 390,
+          "pace": 390
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 396,
+          "pace": 396
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 371,
+          "pace": 371
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 378,
+          "pace": 378
+        },
+        {
+          "distance": 13,
+          "elapsed_time": 3,
+          "pace": 234.4
+        }
+      ]
+    },
+    {
+      "id": 17401047514,
+      "date": "2026-02-15",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 14020,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 15,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 395,
+          "pace": 395
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 380,
+          "pace": 380
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 357,
+          "pace": 357
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 355,
+          "pace": 355
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 355,
+          "pace": 355
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 353,
+          "pace": 353
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 372,
+          "pace": 372
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 355,
+          "pace": 355
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 355,
+          "pace": 355
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 349,
+          "pace": 349
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 347,
+          "pace": 347
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 346,
+          "pace": 346
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 350,
+          "pace": 350
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 350,
+          "pace": 350
+        },
+        {
+          "distance": 20,
+          "elapsed_time": 6,
+          "pace": 299.7
+        }
+      ]
+    },
+    {
+      "id": 17456816319,
+      "date": "2026-02-20",
+      "name": "5k tempo run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 7016,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 8,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 386,
+          "pace": 386
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 373,
+          "pace": 373
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 352,
+          "pace": 352
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 351,
+          "pace": 351
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 348,
+          "pace": 348
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 343,
+          "pace": 343
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 330,
+          "pace": 330
+        },
+        {
+          "distance": 17,
+          "elapsed_time": 5,
+          "pace": 296.2
+        }
+      ]
+    },
+    {
+      "id": 17478572797,
+      "date": "2026-02-22",
+      "name": "Lokmat HM 2026",
+      "description": null,
+      "workout_type": 1,
+      "total_distance": 21231,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 22,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 367,
+          "pace": 367
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 337,
+          "pace": 337
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 323,
+          "pace": 323
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 327,
+          "pace": 327
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 335,
+          "pace": 335
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 344,
+          "pace": 344
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 348,
+          "pace": 348
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 337,
+          "pace": 337
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 345,
+          "pace": 345
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 355,
+          "pace": 355
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 334,
+          "pace": 334
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 329,
+          "pace": 329
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 335,
+          "pace": 335
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 340,
+          "pace": 340
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 358,
+          "pace": 358
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 330,
+          "pace": 330
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 343,
+          "pace": 343
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 353,
+          "pace": 353
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 359,
+          "pace": 359
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 447,
+          "pace": 447
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 365,
+          "pace": 365
+        },
+        {
+          "distance": 232,
+          "elapsed_time": 79,
+          "pace": 340.4
+        }
+      ]
+    },
+    {
+      "id": 17500917786,
+      "date": "2026-02-24",
+      "name": "Recovery Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 8006,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 9,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 533,
+          "pace": 533
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 547,
+          "pace": 547
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 513,
+          "pace": 513
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 523,
+          "pace": 523
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 485,
+          "pace": 485
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 492,
+          "pace": 492
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 478,
+          "pace": 478
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 472,
+          "pace": 472
+        },
+        {
+          "distance": 7,
+          "elapsed_time": 3,
+          "pace": 443.8
+        }
+      ]
+    },
+    {
+      "id": 17559473437,
+      "date": "2026-03-01",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 12416,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 13,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 425,
+          "pace": 425
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 404,
+          "pace": 404
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 397,
+          "pace": 397
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 401,
+          "pace": 401
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 408,
+          "pace": 408
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 391,
+          "pace": 391
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 372,
+          "pace": 372
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 385,
+          "pace": 385
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 394,
+          "pace": 394
+        },
+        {
+          "distance": 418,
+          "elapsed_time": 169,
+          "pace": 404.6
+        }
+      ]
+    },
+    {
+      "id": 17725950630,
+      "date": "2026-03-15",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 11103,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 12,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 435,
+          "pace": 435
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 430,
+          "pace": 430
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 422,
+          "pace": 422
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 412,
+          "pace": 412
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 429,
+          "pace": 429
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 376,
+          "pace": 376
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 434,
+          "pace": 434
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 423,
+          "pace": 423
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 377,
+          "pace": 377
+        },
+        {
+          "distance": 104,
+          "elapsed_time": 38,
+          "pace": 365.8
+        }
+      ]
+    }
+  ],
+  "allRuns": [
+    {
+      "id": 16772882205,
+      "date": "2025-12-18",
+      "name": "Tempo run",
+      "description": null,
+      "workout_type": 0,
+      "total_distance": 10502,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": {
+        "sessionId": 16772882205,
+        "sessionDate": "2025-12-18",
+        "activityName": "Tempo run",
+        "distance": 1000,
+        "avgTime": 380,
+        "avgPace": "6:20",
+        "detected_by": "lap"
+      },
+      "lapCount": 19,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 419,
+          "pace": 419
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 409,
+          "pace": 409
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 418,
+          "pace": 418
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 48,
+          "pace": 480
+        },
+        {
+          "distance": 22,
+          "elapsed_time": 29,
+          "pace": 1335.8
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 17,
+          "elapsed_time": 29,
+          "pace": 1742.8
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 27,
+          "pace": 270
+        },
+        {
+          "distance": 26,
+          "elapsed_time": 29,
+          "pace": 1128.8
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 28,
+          "pace": 280
+        },
+        {
+          "distance": 28,
+          "elapsed_time": 30,
+          "pace": 1072.2
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 337,
+          "pace": 337
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 338,
+          "pace": 338
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 337,
+          "pace": 337
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 334,
+          "pace": 334
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 325,
+          "pace": 325
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 427,
+          "pace": 427
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 452,
+          "pace": 452
+        },
+        {
+          "distance": 10,
+          "elapsed_time": 4,
+          "pace": 395.3
+        }
+      ]
+    },
+    {
+      "id": 16798311382,
+      "date": "2025-12-21",
+      "name": "PCHM - 2025",
+      "description": null,
+      "workout_type": 1,
+      "total_distance": 21326,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 22,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 358,
+          "pace": 358
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 356,
+          "pace": 356
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 350,
+          "pace": 350
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 352,
+          "pace": 352
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 343,
+          "pace": 343
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 344,
+          "pace": 344
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 348,
+          "pace": 348
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 339,
+          "pace": 339
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 338,
+          "pace": 338
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 346,
+          "pace": 346
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 351,
+          "pace": 351
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 340,
+          "pace": 340
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 332,
+          "pace": 332
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 334,
+          "pace": 334
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 338,
+          "pace": 338
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 344,
+          "pace": 344
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 342,
+          "pace": 342
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 335,
+          "pace": 335
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 325,
+          "pace": 325
+        },
+        {
+          "distance": 326,
+          "elapsed_time": 103,
+          "pace": 316.3
+        }
+      ]
+    },
+    {
+      "id": 16850178719,
+      "date": "2025-12-27",
+      "name": "Morning Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 7004,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 8,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 456,
+          "pace": 456
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 435,
+          "pace": 435
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 489,
+          "pace": 489
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 472,
+          "pace": 472
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 452,
+          "pace": 452
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 457,
+          "pace": 457
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 473,
+          "pace": 473
+        },
+        {
+          "distance": 4,
+          "elapsed_time": 3,
+          "pace": 777.2
+        }
+      ]
+    },
+    {
+      "id": 16860063000,
+      "date": "2025-12-28",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 16312,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 17,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 396,
+          "pace": 396
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 369,
+          "pace": 369
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 381,
+          "pace": 381
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 372,
+          "pace": 372
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 400,
+          "pace": 400
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 369,
+          "pace": 369
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 378,
+          "pace": 378
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 467,
+          "pace": 467
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 364,
+          "pace": 364
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 388,
+          "pace": 388
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 363,
+          "pace": 363
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 366,
+          "pace": 366
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 369,
+          "pace": 369
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 367,
+          "pace": 367
+        },
+        {
+          "distance": 312,
+          "elapsed_time": 108,
+          "pace": 346.4
+        }
+      ]
+    },
+    {
+      "id": 16879717160,
+      "date": "2025-12-30",
+      "name": "Intervals",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 11058,
+      "passesPreFilter": true,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": {
+        "sessionId": 16879717160,
+        "sessionDate": "2025-12-30",
+        "activityName": "Intervals",
+        "distance": 1000,
+        "avgTime": 427,
+        "avgPace": "7:07",
+        "detected_by": "lap"
+      },
+      "lapCount": 32,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 411,
+          "pace": 411
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 91,
+          "pace": 910
+        },
+        {
+          "distance": 20,
+          "elapsed_time": 29,
+          "pace": 1486.4
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 28,
+          "pace": 280
+        },
+        {
+          "distance": 19,
+          "elapsed_time": 29,
+          "pace": 1563.3
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 19,
+          "elapsed_time": 29,
+          "pace": 1536
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 27,
+          "pace": 270
+        },
+        {
+          "distance": 31,
+          "elapsed_time": 88,
+          "pace": 2859
+        },
+        {
+          "distance": 800,
+          "elapsed_time": 251,
+          "pace": 313.8
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 95,
+          "pace": 475
+        },
+        {
+          "distance": 800,
+          "elapsed_time": 251,
+          "pace": 313.8
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 107,
+          "pace": 535
+        },
+        {
+          "distance": 800,
+          "elapsed_time": 250,
+          "pace": 312.5
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 120,
+          "pace": 600
+        },
+        {
+          "distance": 800,
+          "elapsed_time": 251,
+          "pace": 313.8
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 130,
+          "pace": 650
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 120,
+          "pace": 300
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 120,
+          "pace": 600
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 120,
+          "pace": 300
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 147,
+          "pace": 735
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 119,
+          "pace": 297.5
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 122,
+          "pace": 610
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 119,
+          "pace": 297.5
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 139,
+          "pace": 695
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 114,
+          "pace": 285
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 133,
+          "pace": 665
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 112,
+          "pace": 280
+        },
+        {
+          "distance": 61,
+          "elapsed_time": 41,
+          "pace": 675.7
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 466,
+          "pace": 466
+        },
+        {
+          "distance": 109,
+          "elapsed_time": 44,
+          "pace": 401.9
+        }
+      ]
+    },
+    {
+      "id": 16918799054,
+      "date": "2026-01-03",
+      "name": "Shakeout Run with drills",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 6007,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 7,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 1081,
+          "pace": 1081
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 477,
+          "pace": 477
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 504,
+          "pace": 504
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 507,
+          "pace": 507
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 514,
+          "pace": 514
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 530,
+          "pace": 530
+        },
+        {
+          "distance": 7,
+          "elapsed_time": 3,
+          "pace": 404.3
+        }
+      ]
+    },
+    {
+      "id": 16929955414,
+      "date": "2026-01-04",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 16151,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 17,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 388,
+          "pace": 388
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 366,
+          "pace": 366
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 366,
+          "pace": 366
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 369,
+          "pace": 369
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 367,
+          "pace": 367
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 375,
+          "pace": 375
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 358,
+          "pace": 358
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 361,
+          "pace": 361
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 364,
+          "pace": 364
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 378,
+          "pace": 378
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 364,
+          "pace": 364
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 361,
+          "pace": 361
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 367,
+          "pace": 367
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 357,
+          "pace": 357
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 346,
+          "pace": 346
+        },
+        {
+          "distance": 151,
+          "elapsed_time": 53,
+          "pace": 350.6
+        }
+      ]
+    },
+    {
+      "id": 16951803474,
+      "date": "2026-01-06",
+      "name": "Intervals",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 10161,
+      "passesPreFilter": true,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": {
+        "sessionId": 16951803474,
+        "sessionDate": "2026-01-06",
+        "activityName": "Intervals",
+        "distance": 400,
+        "avgTime": 111,
+        "avgPace": "4:38",
+        "detected_by": "lap"
+      },
+      "lapCount": 35,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 459,
+          "pace": 459
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 401,
+          "pace": 401
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 70,
+          "pace": 700
+        },
+        {
+          "distance": 15,
+          "elapsed_time": 29,
+          "pace": 1895.4
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 26,
+          "pace": 260
+        },
+        {
+          "distance": 25,
+          "elapsed_time": 29,
+          "pace": 1168.9
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 24,
+          "pace": 240
+        },
+        {
+          "distance": 23,
+          "elapsed_time": 29,
+          "pace": 1244.6
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 33,
+          "elapsed_time": 132,
+          "pace": 4000
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 116,
+          "pace": 290
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 142,
+          "pace": 710
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 116,
+          "pace": 290
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 161,
+          "pace": 805
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 114,
+          "pace": 285
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 156,
+          "pace": 780
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 116,
+          "pace": 290
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 141,
+          "pace": 705
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 112,
+          "pace": 280
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 148,
+          "pace": 740
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 111,
+          "pace": 277.5
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 155,
+          "pace": 775
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 109,
+          "pace": 272.5
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 160,
+          "pace": 800
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 108,
+          "pace": 270
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 153,
+          "pace": 765
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 108,
+          "pace": 270
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 166,
+          "pace": 830
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 106,
+          "pace": 265
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 163,
+          "pace": 815
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 108,
+          "pace": 270
+        },
+        {
+          "distance": 200,
+          "elapsed_time": 156,
+          "pace": 780
+        },
+        {
+          "distance": 400,
+          "elapsed_time": 102,
+          "pace": 255
+        },
+        {
+          "distance": 56,
+          "elapsed_time": 48,
+          "pace": 857.8
+        },
+        {
+          "distance": 609,
+          "elapsed_time": 349,
+          "pace": 573.4
+        }
+      ]
+    },
+    {
+      "id": 16979220987,
+      "date": "2026-01-08",
+      "name": "Evening Run - Treadmill run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 5900,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 6,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 424,
+          "pace": 424
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 399,
+          "pace": 399
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 480,
+          "pace": 480
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 409,
+          "pace": 409
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 401,
+          "pace": 401
+        },
+        {
+          "distance": 104,
+          "elapsed_time": 41,
+          "pace": 394.3
+        }
+      ]
+    },
+    {
+      "id": 17007280272,
+      "date": "2026-01-11",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 18020,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 19,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 395,
+          "pace": 395
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 382,
+          "pace": 382
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 368,
+          "pace": 368
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 367,
+          "pace": 367
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 377,
+          "pace": 377
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 365,
+          "pace": 365
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 364,
+          "pace": 364
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 364,
+          "pace": 364
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 363,
+          "pace": 363
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 368,
+          "pace": 368
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 365,
+          "pace": 365
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 363,
+          "pace": 363
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 363,
+          "pace": 363
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 357,
+          "pace": 357
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 357,
+          "pace": 357
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 354,
+          "pace": 354
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 353,
+          "pace": 353
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 331,
+          "pace": 331
+        },
+        {
+          "distance": 20,
+          "elapsed_time": 5,
+          "pace": 250.4
+        }
+      ]
+    },
+    {
+      "id": 17007279173,
+      "date": "2026-01-11",
+      "name": "Cooldown",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 1150,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 2
+    },
+    {
+      "id": 17075812268,
+      "date": "2026-01-17",
+      "name": "Saturday Shakeout Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 8008,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 9,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 483,
+          "pace": 483
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 440,
+          "pace": 440
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 495,
+          "pace": 495
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 456,
+          "pace": 456
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 478,
+          "pace": 478
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 445,
+          "pace": 445
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 439,
+          "pace": 439
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 445,
+          "pace": 445
+        },
+        {
+          "distance": 8,
+          "elapsed_time": 8,
+          "pace": 1033.6
+        }
+      ]
+    },
+    {
+      "id": 17087610466,
+      "date": "2026-01-18",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 21158,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 22,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 381,
+          "pace": 381
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 371,
+          "pace": 371
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 366,
+          "pace": 366
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 358,
+          "pace": 358
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 402,
+          "pace": 402
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 351,
+          "pace": 351
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 361,
+          "pace": 361
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 357,
+          "pace": 357
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 366,
+          "pace": 366
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 359,
+          "pace": 359
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 359,
+          "pace": 359
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 354,
+          "pace": 354
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 380,
+          "pace": 380
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 352,
+          "pace": 352
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 354,
+          "pace": 354
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 360,
+          "pace": 360
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 347,
+          "pace": 347
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 346,
+          "pace": 346
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 350,
+          "pace": 350
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 328,
+          "pace": 328
+        },
+        {
+          "distance": 159,
+          "elapsed_time": 51,
+          "pace": 320.1
+        }
+      ]
+    },
+    {
+      "id": 17110619874,
+      "date": "2026-01-20",
+      "name": "Recovery Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 9025,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 10,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 439,
+          "pace": 439
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 415,
+          "pace": 415
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 424,
+          "pace": 424
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 411,
+          "pace": 411
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 401,
+          "pace": 401
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 400,
+          "pace": 400
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 407,
+          "pace": 407
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 402,
+          "pace": 402
+        },
+        {
+          "distance": 26,
+          "elapsed_time": 9,
+          "pace": 351.4
+        }
+      ]
+    },
+    {
+      "id": 17178643249,
+      "date": "2026-01-26",
+      "name": "Morning Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 7023,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 8,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 380,
+          "pace": 380
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 375,
+          "pace": 375
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 381,
+          "pace": 381
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 377,
+          "pace": 377
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 379,
+          "pace": 379
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 375,
+          "pace": 375
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 387,
+          "pace": 387
+        },
+        {
+          "distance": 24,
+          "elapsed_time": 9,
+          "pace": 371.6
+        }
+      ]
+    },
+    {
+      "id": 17178643215,
+      "date": "2026-01-26",
+      "name": "Cooldown",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 1270,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 2
+    },
+    {
+      "id": 17212385058,
+      "date": "2026-01-29",
+      "name": "Warmup + 4*100m strides",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 1882,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": [
+        {
+          "sessionId": 17212385058,
+          "sessionDate": "2026-01-29",
+          "activityName": "Warmup + 4*100m strides",
+          "distance": 1000,
+          "avgTime": 432,
+          "avgPace": "7:12",
+          "detected_by": "lap"
+        },
+        {
+          "sessionId": 17212385058,
+          "sessionDate": "2026-01-29",
+          "activityName": "Warmup + 4*100m strides",
+          "distance": 400,
+          "avgTime": 167,
+          "avgPace": "6:57",
+          "detected_by": "lap"
+        }
+      ],
+      "lapCount": 10,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 432,
+          "pace": 432
+        },
+        {
+          "distance": 401,
+          "elapsed_time": 167,
+          "pace": 416
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 72,
+          "pace": 720
+        },
+        {
+          "distance": 21,
+          "elapsed_time": 29,
+          "pace": 1380.3
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 27,
+          "pace": 270
+        },
+        {
+          "distance": 26,
+          "elapsed_time": 29,
+          "pace": 1097.7
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 26,
+          "pace": 260
+        },
+        {
+          "distance": 22,
+          "elapsed_time": 29,
+          "pace": 1335.8
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 26,
+          "pace": 260
+        },
+        {
+          "distance": 12,
+          "elapsed_time": 6,
+          "pace": 521.7
+        }
+      ]
+    },
+    {
+      "id": 17212385268,
+      "date": "2026-01-29",
+      "name": "Progressive Tempo Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 8062,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 9,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 370,
+          "pace": 370
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 363,
+          "pace": 363
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 366,
+          "pace": 366
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 356,
+          "pace": 356
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 354,
+          "pace": 354
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 351,
+          "pace": 351
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 346,
+          "pace": 346
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 329,
+          "pace": 329
+        },
+        {
+          "distance": 62,
+          "elapsed_time": 19,
+          "pace": 306.7
+        }
+      ]
+    },
+    {
+      "id": 17212385031,
+      "date": "2026-01-29",
+      "name": "Cooldown",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 1088,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 2
+    },
+    {
+      "id": 17323591644,
+      "date": "2026-02-08",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 12013,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 13,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 419,
+          "pace": 419
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 402,
+          "pace": 402
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 415,
+          "pace": 415
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 385,
+          "pace": 385
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 407,
+          "pace": 407
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 395,
+          "pace": 395
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 415,
+          "pace": 415
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 390,
+          "pace": 390
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 396,
+          "pace": 396
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 371,
+          "pace": 371
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 378,
+          "pace": 378
+        },
+        {
+          "distance": 13,
+          "elapsed_time": 3,
+          "pace": 234.4
+        }
+      ]
+    },
+    {
+      "id": 17369156298,
+      "date": "2026-02-12",
+      "name": "Tempo Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 10056,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": {
+        "sessionId": 17369156298,
+        "sessionDate": "2026-02-12",
+        "activityName": "Tempo Run",
+        "distance": 1000,
+        "avgTime": 357,
+        "avgPace": "5:57",
+        "detected_by": "lap"
+      },
+      "lapCount": 20,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 408,
+          "pace": 408
+        },
+        {
+          "distance": 473,
+          "elapsed_time": 191,
+          "pace": 404.2
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 64,
+          "pace": 640
+        },
+        {
+          "distance": 21,
+          "elapsed_time": 29,
+          "pace": 1396.2
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 27,
+          "pace": 270
+        },
+        {
+          "distance": 15,
+          "elapsed_time": 29,
+          "pace": 1900.4
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 26,
+          "pace": 260
+        },
+        {
+          "distance": 18,
+          "elapsed_time": 29,
+          "pace": 1575.2
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 24,
+          "elapsed_time": 122,
+          "pace": 5113.2
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 355,
+          "pace": 355
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 350,
+          "pace": 350
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 343,
+          "pace": 343
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 339,
+          "pace": 339
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 338,
+          "pace": 338
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 330,
+          "pace": 330
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 325,
+          "pace": 325
+        },
+        {
+          "distance": 49,
+          "elapsed_time": 16,
+          "pace": 325.4
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 421,
+          "pace": 421
+        },
+        {
+          "distance": 56,
+          "elapsed_time": 22,
+          "pace": 390.2
+        }
+      ]
+    },
+    {
+      "id": 17401047514,
+      "date": "2026-02-15",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 14020,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 15,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 395,
+          "pace": 395
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 380,
+          "pace": 380
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 357,
+          "pace": 357
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 355,
+          "pace": 355
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 355,
+          "pace": 355
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 353,
+          "pace": 353
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 372,
+          "pace": 372
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 355,
+          "pace": 355
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 355,
+          "pace": 355
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 349,
+          "pace": 349
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 347,
+          "pace": 347
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 346,
+          "pace": 346
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 350,
+          "pace": 350
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 350,
+          "pace": 350
+        },
+        {
+          "distance": 20,
+          "elapsed_time": 6,
+          "pace": 299.7
+        }
+      ]
+    },
+    {
+      "id": 17456816319,
+      "date": "2026-02-20",
+      "name": "5k tempo run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 7016,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 8,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 386,
+          "pace": 386
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 373,
+          "pace": 373
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 352,
+          "pace": 352
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 351,
+          "pace": 351
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 348,
+          "pace": 348
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 343,
+          "pace": 343
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 330,
+          "pace": 330
+        },
+        {
+          "distance": 17,
+          "elapsed_time": 5,
+          "pace": 296.2
+        }
+      ]
+    },
+    {
+      "id": 17456816269,
+      "date": "2026-02-20",
+      "name": "Cooldown",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 2096,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 3
+    },
+    {
+      "id": 17478572797,
+      "date": "2026-02-22",
+      "name": "Lokmat HM 2026",
+      "description": null,
+      "workout_type": 1,
+      "total_distance": 21231,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 22,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 367,
+          "pace": 367
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 337,
+          "pace": 337
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 323,
+          "pace": 323
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 327,
+          "pace": 327
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 335,
+          "pace": 335
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 344,
+          "pace": 344
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 348,
+          "pace": 348
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 337,
+          "pace": 337
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 345,
+          "pace": 345
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 355,
+          "pace": 355
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 334,
+          "pace": 334
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 329,
+          "pace": 329
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 335,
+          "pace": 335
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 340,
+          "pace": 340
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 358,
+          "pace": 358
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 330,
+          "pace": 330
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 343,
+          "pace": 343
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 353,
+          "pace": 353
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 359,
+          "pace": 359
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 447,
+          "pace": 447
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 365,
+          "pace": 365
+        },
+        {
+          "distance": 232,
+          "elapsed_time": 79,
+          "pace": 340.4
+        }
+      ]
+    },
+    {
+      "id": 17500917786,
+      "date": "2026-02-24",
+      "name": "Recovery Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 8006,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 9,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 533,
+          "pace": 533
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 547,
+          "pace": 547
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 513,
+          "pace": 513
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 523,
+          "pace": 523
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 485,
+          "pace": 485
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 492,
+          "pace": 492
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 478,
+          "pace": 478
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 472,
+          "pace": 472
+        },
+        {
+          "distance": 7,
+          "elapsed_time": 3,
+          "pace": 443.8
+        }
+      ]
+    },
+    {
+      "id": 17559473437,
+      "date": "2026-03-01",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 12416,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 13,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 425,
+          "pace": 425
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 404,
+          "pace": 404
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 397,
+          "pace": 397
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 401,
+          "pace": 401
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 408,
+          "pace": 408
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 391,
+          "pace": 391
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 372,
+          "pace": 372
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 385,
+          "pace": 385
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 394,
+          "pace": 394
+        },
+        {
+          "distance": 418,
+          "elapsed_time": 169,
+          "pace": 404.6
+        }
+      ]
+    },
+    {
+      "id": 17582963393,
+      "date": "2026-03-03",
+      "name": "Intervals",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 7143,
+      "passesPreFilter": true,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": {
+        "sessionId": 17582963393,
+        "sessionDate": "2026-03-03",
+        "activityName": "Intervals",
+        "distance": -60,
+        "avgTime": 60,
+        "avgPace": "4:41",
+        "avgCoveredDistance": 213,
+        "detected_by": "lap"
+      },
+      "lapCount": 44,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 421,
+          "pace": 421
+        },
+        {
+          "distance": 418,
+          "elapsed_time": 178,
+          "pace": 425.4
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 67,
+          "pace": 670
+        },
+        {
+          "distance": 30,
+          "elapsed_time": 29,
+          "pace": 978.7
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 26,
+          "pace": 260
+        },
+        {
+          "distance": 11,
+          "elapsed_time": 29,
+          "pace": 2655.7
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 24,
+          "elapsed_time": 29,
+          "pace": 1212.9
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 21,
+          "elapsed_time": 29,
+          "pace": 1392.9
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 29,
+          "elapsed_time": 29,
+          "pace": 1008.7
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 28,
+          "pace": 280
+        },
+        {
+          "distance": 24,
+          "elapsed_time": 83,
+          "pace": 3417
+        },
+        {
+          "distance": 217,
+          "elapsed_time": 60,
+          "pace": 276.6
+        },
+        {
+          "distance": 48,
+          "elapsed_time": 75,
+          "pace": 1551.2
+        },
+        {
+          "distance": 219,
+          "elapsed_time": 60,
+          "pace": 274.3
+        },
+        {
+          "distance": 66,
+          "elapsed_time": 75,
+          "pace": 1138.4
+        },
+        {
+          "distance": 222,
+          "elapsed_time": 60,
+          "pace": 270.6
+        },
+        {
+          "distance": 57,
+          "elapsed_time": 75,
+          "pace": 1319
+        },
+        {
+          "distance": 219,
+          "elapsed_time": 60,
+          "pace": 273.8
+        },
+        {
+          "distance": 58,
+          "elapsed_time": 75,
+          "pace": 1287.8
+        },
+        {
+          "distance": 219,
+          "elapsed_time": 60,
+          "pace": 274.2
+        },
+        {
+          "distance": 68,
+          "elapsed_time": 75,
+          "pace": 1100.2
+        },
+        {
+          "distance": 223,
+          "elapsed_time": 60,
+          "pace": 268.7
+        },
+        {
+          "distance": 51,
+          "elapsed_time": 75,
+          "pace": 1470.9
+        },
+        {
+          "distance": 223,
+          "elapsed_time": 60,
+          "pace": 268.8
+        },
+        {
+          "distance": 74,
+          "elapsed_time": 75,
+          "pace": 1007
+        },
+        {
+          "distance": 222,
+          "elapsed_time": 60,
+          "pace": 270
+        },
+        {
+          "distance": 55,
+          "elapsed_time": 75,
+          "pace": 1351.6
+        },
+        {
+          "distance": 224,
+          "elapsed_time": 60,
+          "pace": 268
+        },
+        {
+          "distance": 81,
+          "elapsed_time": 75,
+          "pace": 927.1
+        },
+        {
+          "distance": 225,
+          "elapsed_time": 60,
+          "pace": 266.3
+        },
+        {
+          "distance": 60,
+          "elapsed_time": 75,
+          "pace": 1250
+        },
+        {
+          "distance": 224,
+          "elapsed_time": 60,
+          "pace": 267.4
+        },
+        {
+          "distance": 75,
+          "elapsed_time": 75,
+          "pace": 1004.4
+        },
+        {
+          "distance": 221,
+          "elapsed_time": 60,
+          "pace": 272
+        },
+        {
+          "distance": 41,
+          "elapsed_time": 78,
+          "pace": 1907.1
+        },
+        {
+          "distance": 224,
+          "elapsed_time": 60,
+          "pace": 268.3
+        },
+        {
+          "distance": 83,
+          "elapsed_time": 75,
+          "pace": 899.5
+        },
+        {
+          "distance": 219,
+          "elapsed_time": 60,
+          "pace": 274.6
+        },
+        {
+          "distance": 61,
+          "elapsed_time": 75,
+          "pace": 1231.7
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 424,
+          "pace": 424
+        },
+        {
+          "distance": 9,
+          "elapsed_time": 3,
+          "pace": 340.5
+        }
+      ]
+    },
+    {
+      "id": 17608254764,
+      "date": "2026-03-05",
+      "name": "Tempo Run",
+      "description": null,
+      "workout_type": null,
+      "total_distance": 9254,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": true,
+      "detection": {
+        "sessionId": 17608254764,
+        "sessionDate": "2026-03-05",
+        "activityName": "Tempo Run",
+        "distance": 1000,
+        "avgTime": 360,
+        "avgPace": "6:00",
+        "detected_by": "lap"
+      },
+      "lapCount": 19,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 409,
+          "pace": 409
+        },
+        {
+          "distance": 474,
+          "elapsed_time": 190,
+          "pace": 401.1
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 71,
+          "pace": 710
+        },
+        {
+          "distance": 18,
+          "elapsed_time": 29,
+          "pace": 1596.9
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 27,
+          "pace": 270
+        },
+        {
+          "distance": 18,
+          "elapsed_time": 29,
+          "pace": 1572.7
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 25,
+          "pace": 250
+        },
+        {
+          "distance": 29,
+          "elapsed_time": 29,
+          "pace": 983.7
+        },
+        {
+          "distance": 100,
+          "elapsed_time": 26,
+          "pace": 260
+        },
+        {
+          "distance": 33,
+          "elapsed_time": 99,
+          "pace": 3024.7
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 335,
+          "pace": 335
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 334,
+          "pace": 334
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 337,
+          "pace": 337
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 340,
+          "pace": 340
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 337,
+          "pace": 337
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 334,
+          "pace": 334
+        },
+        {
+          "distance": 250,
+          "elapsed_time": 80,
+          "pace": 320.5
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 452,
+          "pace": 452
+        },
+        {
+          "distance": 32,
+          "elapsed_time": 13,
+          "pace": 404
+        }
+      ]
+    },
+    {
+      "id": 17725950630,
+      "date": "2026-03-15",
+      "name": "Sunday Long Run",
+      "description": null,
+      "workout_type": 2,
+      "total_distance": 11103,
+      "passesPreFilter": false,
+      "descriptionDetection": null,
+      "detected": false,
+      "detection": null,
+      "lapCount": 12,
+      "laps": [
+        {
+          "distance": 1000,
+          "elapsed_time": 435,
+          "pace": 435
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 430,
+          "pace": 430
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 422,
+          "pace": 422
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 412,
+          "pace": 412
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 429,
+          "pace": 429
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 376,
+          "pace": 376
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 362,
+          "pace": 362
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 434,
+          "pace": 434
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 423,
+          "pace": 423
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 403,
+          "pace": 403
+        },
+        {
+          "distance": 1000,
+          "elapsed_time": 377,
+          "pace": 377
+        },
+        {
+          "distance": 104,
+          "elapsed_time": 38,
+          "pace": 365.8
+        }
+      ]
+    }
+  ]
+}

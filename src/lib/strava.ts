@@ -112,19 +112,23 @@ export function parseDescriptionForIntervals(
  * interspersed between work laps — the hallmark of interval training.
  */
 export function inferDistanceFromLaps(
-  laps: any[]
+  rawLaps: any[]
 ): DetectedInterval | DetectedInterval[] | null {
-  if (!laps || laps.length < 3) return null;
+  if (!rawLaps || rawLaps.length < 3) return null;
+
+  // Filter out micro-laps (<50m) — GPS noise, drills, standing pauses
+  const laps = rawLaps.filter((lap: any) => lap.distance >= 50);
+  if (laps.length < 3) return null;
 
   const validValues = Object.values(INTERVAL_DISTANCES);
   const paces = laps.map((lap: any) => lap.elapsed_time / (lap.distance || 1));
 
   /**
-   * Verify interval pattern: work laps must have recovery gaps between them
-   * and be faster than the non-work laps.
+   * Verify interval pattern: work laps must be individually separated by
+   * recovery laps (not forming one continuous block like a tempo run).
    */
   function hasIntervalPattern(matchedIndices: Set<number>): boolean {
-    if (matchedIndices.size < 2) return false;
+    if (matchedIndices.size < 3) return false;
 
     const workIndices = [...matchedIndices].sort((a, b) => a - b);
     const restIndices = laps
@@ -133,43 +137,22 @@ export function inferDistanceFromLaps(
 
     if (restIndices.length === 0) return false;
 
-    // Check that gaps between work laps contain slower recovery laps
-    let recoveryGaps = 0;
-    let totalGaps = 0;
+    // Reject continuous blocks: every consecutive pair of work laps must
+    // have at least one non-work lap between them. Count how many do.
+    let separatedPairs = 0;
+    for (let i = 0; i < workIndices.length - 1; i++) {
+      if (workIndices[i + 1] - workIndices[i] > 1) separatedPairs++;
+    }
+    // At least half of consecutive pairs must be separated by recovery
+    if (separatedPairs < (workIndices.length - 1) * 0.5) return false;
+
+    // Work laps must be meaningfully faster than rest laps
     const avgWorkPace =
       workIndices.reduce((s: number, i: number) => s + paces[i], 0) / workIndices.length;
-
-    for (let i = 0; i < workIndices.length - 1; i++) {
-      const from = workIndices[i];
-      const to = workIndices[i + 1];
-      if (to - from <= 1) continue;
-      totalGaps++;
-      const gapLaps = laps.slice(from + 1, to);
-      // At least one lap in the gap must be slower than work pace
-      const hasSlower = gapLaps.some(
-        (lap: any) => lap.elapsed_time / (lap.distance || 1) > avgWorkPace
-      );
-      if (hasSlower) recoveryGaps++;
-    }
-
-    // Need at least half of gaps to be recovery, and at least 1 gap
-    if (totalGaps === 0 || recoveryGaps < totalGaps * 0.5) return false;
-
-    // Work laps must be ≥20% faster pace than rest laps
     const avgRestPace =
       restIndices.reduce((s: number, i: number) => s + paces[i], 0) / restIndices.length;
 
     if (avgWorkPace >= avgRestPace * 0.8) return false;
-
-    // Reject tempo/steady-state runs: if all rest laps are only at the
-    // edges (before first work lap or after last), the work laps form one
-    // continuous block — that's a tempo run, not intervals.
-    const firstWork = workIndices[0];
-    const lastWork = workIndices[workIndices.length - 1];
-    const hasRestBetweenWork = restIndices.some(
-      (i: number) => i > firstWork && i < lastWork
-    );
-    if (!hasRestBetweenWork) return false;
 
     return true;
   }
