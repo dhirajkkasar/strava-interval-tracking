@@ -9,6 +9,7 @@ jest.mock("next-auth", () => ({
 jest.mock("../lib/strava", () => ({
   fetchStravaActivities: jest.fn(),
   fetchDetailedActivity: jest.fn(),
+  looksLikeIntervalActivity: jest.requireActual("../lib/strava").looksLikeIntervalActivity,
   parseIntervalSession: jest.fn(),
   calculatePace: jest.requireActual("../lib/strava").calculatePace,
 }));
@@ -138,19 +139,21 @@ describe("POST /api/dashboard", () => {
     expect(data.dailyAverages[0].sessions).toHaveLength(2);
   });
 
-  it("only fetches details for Run activities", async () => {
+  it("only fetches details for interval-looking Run activities", async () => {
     mockGetServerSession.mockResolvedValue({ accessToken: "tok" } as any);
     mockFetchActivities.mockResolvedValue([
-      { id: 1, name: "Easy jog", type: "Run", sport_type: "Run" },
-      { id: 2, name: "Bike ride", type: "Ride", sport_type: "Ride" },
+      { id: 1, name: "5x400m intervals", type: "Run", sport_type: "Run" }, // keyword match → fetched
+      { id: 2, name: "Easy jog",         type: "Run", sport_type: "Run" }, // no keyword → skipped
+      { id: 3, name: "Bike ride",        type: "Ride", sport_type: "Ride" }, // not a run → skipped
     ]);
     mockFetchDetailed.mockResolvedValue({} as any);
     mockParseInterval.mockReturnValue(null);
 
     await POST(makeRequest({ startDate: "2024-01-01", endDate: "2024-02-01" }));
 
-    // Only the Run activity should have fetchDetailedActivity called
+    // Only the interval Run should trigger a detailed fetch
     expect(mockFetchDetailed).toHaveBeenCalledTimes(1);
+    expect(mockFetchDetailed).toHaveBeenCalledWith("tok", 1);
   });
 
   it("returns empty results when no intervals found", async () => {

@@ -463,9 +463,32 @@ export async function fetchDetailedActivity(
     }
   );
 
+  if (response.status === 429) {
+    throw new Error("RATE_LIMITED");
+  }
+
   if (!response.ok) {
     throw new Error(`Failed to fetch activity ${activityId}`);
   }
 
   return response.json();
+}
+
+/**
+ * Quick pre-filter on summary activity data to decide if fetching
+ * full lap details is worth the API call.
+ *
+ * Returns true when the activity is plausibly an interval session.
+ * Strava marks explicit workouts with workout_type === 3; anything
+ * else is caught by name keywords or an explicit NxDm pattern.
+ */
+export function looksLikeIntervalActivity(activity: {
+  name?: string;
+  workout_type?: number;
+}): boolean {
+  if (activity.workout_type === 3) return true;
+  const name = activity.name ?? "";
+  const keywords = /interval|repeat|rep|fartlek|speed\s*work|track|stride/i;
+  const pattern  = /\d+\s*[x×*]\s*\d+\s*(?:m|meter|min|k\b)/i;
+  return keywords.test(name) || pattern.test(name);
 }

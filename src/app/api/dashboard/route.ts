@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
-import { fetchStravaActivities, fetchDetailedActivity, parseIntervalSession, calculatePace } from "../../../lib/strava";
+import { fetchStravaActivities, fetchDetailedActivity, looksLikeIntervalActivity, parseIntervalSession, calculatePace } from "../../../lib/strava";
 import { ParsedInterval, IntervalDay, INTERVAL_DISTANCES, isTimeBasedInterval } from "../../../types";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -54,18 +54,22 @@ export async function POST(request: NextRequest) {
     );
     console.log("✅ [Dashboard API] Fetched", activities.length, "activities");
 
-    // Fetch details for all Run activities — the lap-based detection
-    // needs full lap data and can't be pre-filtered by keywords alone.
-    const candidates = activities.filter((a: any) =>
-      a.type === "Run" || a.sport_type === "Run"
-    );
-    console.log("🎯 [Dashboard API]", candidates.length, "runs from", activities.length, "activities");
+    // Pre-filter: only fetch detailed lap data for activities that are plausibly
+    // intervals. Fetching details for every easy/long run wastes API quota and
+    // is the primary cause of Strava's 429 Too Many Requests errors.
+    const runs = activities.filter((a: any) => a.type === "Run" || a.sport_type === "Run");
+    const candidates = runs.filter(looksLikeIntervalActivity);
+    console.log("🎯 [Dashboard API]", candidates.length, "interval candidates from", runs.length, "runs");
 
-    // Parse intervals from activities - fetch details in parallel (5 at a time)
-    const CONCURRENCY = 5;
+    // Fetch details in small batches with a short delay to stay well inside
+    // Strava's 100 req / 15 min rate limit.
+    const CONCURRENCY = 3;
+    const BATCH_DELAY_MS = 300;
     const parsedIntervals: ParsedInterval[] = [];
 
     for (let i = 0; i < candidates.length; i += CONCURRENCY) {
+      if (i > 0) await new Promise((r) => setTimeout(r, BATCH_DELAY_MS));
+
       const batch = candidates.slice(i, i + CONCURRENCY);
       const results = await Promise.allSettled(
         batch.map(async (activity: any) => {
@@ -75,7 +79,16 @@ export async function POST(request: NextRequest) {
       );
 
       for (const result of results) {
-        if (result.status === "fulfilled" && result.value) {
+        if (result.status === "rejected") {
+          if ((result.reason as Error)?.message === "RATE_LIMITED") {
+            return NextResponse.json(
+              { error: "Strava rate limit reached — please wait a minute and try again." },
+              { status: 429 }
+            );
+          }
+          continue;
+        }
+        if (result.value) {
           const intervals = Array.isArray(result.value) ? result.value : [result.value];
           for (const interval of intervals) {
             if (!distance || interval.distance === distance) {
