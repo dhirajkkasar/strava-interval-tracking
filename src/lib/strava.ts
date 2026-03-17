@@ -18,9 +18,9 @@ export function parseDescriptionForIntervals(
   const validDistances = Object.values(INTERVAL_DISTANCES);
 
   for (const text of texts) {
-    // Time-based: "5x1min", "5 x 2 min", "5×1min"
+    // Time-based: "5x1min", "5 x 2 min", "5×1min", "5*1min"
     const timePatterns = [
-      /(\d+)\s*[x×]\s*(\d+)\s*min/gi,
+      /(\d+)\s*[x×*]\s*(\d+)\s*min/gi,
     ];
 
     for (const pattern of timePatterns) {
@@ -36,27 +36,19 @@ export function parseDescriptionForIntervals(
       }
     }
 
-    // Distance-based: "5x400m", "5 x 400m", "5×400m", "400m x 5", "5 repeat of 400m"
-    const distPatterns = [
-      /(\d+)\s*[x×]\s*(\d+)\s*(?:m|meter)/gi,
-      /(\d+)\s*(?:m|meter)\s*[x×]\s*(\d+)/gi,       // 400m x 5 (reversed)
-      /(\d+)\s*repeat\s*(?:of\s+)?(\d+)\s*m/gi,
+    // Distance-based: "5x400m", "5 x 400m", "5×400m", "5*400m", "400m x 5", "5 repeat of 400m"
+    const distPatterns: Array<{ regex: RegExp; reversed: boolean }> = [
+      { regex: /(\d+)\s*[x×*]\s*(\d+)\s*(?:m|meter)/gi, reversed: false },  // 5x400m
+      { regex: /(\d+)\s*(?:m|meter)\s*[x×*]\s*(\d+)/gi, reversed: true },   // 400m x 5
+      { regex: /(\d+)\s*repeat\s*(?:of\s+)?(\d+)\s*m/gi, reversed: false }, // 5 repeat of 400m
     ];
 
-    for (const pattern of distPatterns) {
-      pattern.lastIndex = 0;
-      const match = pattern.exec(text);
+    for (const { regex, reversed } of distPatterns) {
+      regex.lastIndex = 0;
+      const match = regex.exec(text);
       if (match) {
-        let count: number, distance: number;
-        // For reversed pattern "400m x 5", match[1] is distance, match[2] is count
-        if (pattern.source.includes("meter\\s")) {
-          distance = parseInt(match[1]);
-          count = parseInt(match[2]);
-        } else {
-          count = parseInt(match[1]);
-          distance = parseInt(match[2]);
-        }
-
+        const count    = reversed ? parseInt(match[2]) : parseInt(match[1]);
+        const distance = reversed ? parseInt(match[1]) : parseInt(match[2]);
         if (validDistances.includes(distance as typeof validDistances[number])) {
           return { distance, count };
         }
@@ -143,14 +135,20 @@ export function inferDistanceFromLaps(
     for (let i = 0; i < workIndices.length - 1; i++) {
       if (workIndices[i + 1] - workIndices[i] > 1) separatedPairs++;
     }
-    // At least half of consecutive pairs must be separated by recovery
-    if (separatedPairs < (workIndices.length - 1) * 0.5) return false;
+    // At least 75% of consecutive pairs must be separated by recovery.
+    // 50% was too permissive — tempo runs with GPS artifact laps could pass.
+    if (separatedPairs < (workIndices.length - 1) * 0.75) return false;
+
+    // For pace comparison, use only meaningful rest laps (≥100m).
+    // Tiny GPS artifacts (50–99m) have unreliable paces and skew the average.
+    const meaningfulRestIndices = restIndices.filter((i: number) => laps[i].distance >= 100);
+    const restForPace = meaningfulRestIndices.length > 0 ? meaningfulRestIndices : restIndices;
 
     // Work laps must be meaningfully faster than rest laps
     const avgWorkPace =
       workIndices.reduce((s: number, i: number) => s + paces[i], 0) / workIndices.length;
     const avgRestPace =
-      restIndices.reduce((s: number, i: number) => s + paces[i], 0) / restIndices.length;
+      restForPace.reduce((s: number, i: number) => s + paces[i], 0) / restForPace.length;
 
     if (avgWorkPace >= avgRestPace * 0.8) return false;
 
@@ -213,6 +211,49 @@ export function inferDistanceFromLaps(
     return { distance: Number(dist), count: indices.size };
   }
 
+  // --- 100m stride detection (operates on rawLaps to preserve recovery gaps) ---
+  // Criterion: fast 100m laps separated by very slow or tiny recovery laps.
+  // GPS artifact 100m laps in tempo/interval runs are ruled out by requiring
+  // that strides outnumber the longer-distance laps in the activity.
+  {
+    const STRIDE_PACE_THRESHOLD = 0.40; // faster than 6:40/km (0.40 sec/m)
+    const fastStrideLaps: number[] = [];
+    for (let i = 0; i < rawLaps.length; i++) {
+      const lap = rawLaps[i];
+      if (Math.abs(lap.distance - 100) <= 100 * 0.15) {
+        if (lap.elapsed_time / (lap.distance || 1) < STRIDE_PACE_THRESHOLD) {
+          fastStrideLaps.push(i);
+        }
+      }
+    }
+
+    if (fastStrideLaps.length >= 3) {
+      // Count laps with distance > 300m in the raw activity.
+      // If there are more long laps than strides, the 100m laps are likely
+      // GPS transition artifacts in a longer run (tempo/intervals), not real strides.
+      const longLapCount = rawLaps.filter((l: any) => l.distance > 300).length;
+      if (fastStrideLaps.length >= longLapCount) {
+        // Check that consecutive strides are separated by a slow/tiny recovery:
+        // either a sub-50m GPS drift lap OR any lap at walking pace (>1.5 sec/m).
+        let separatedPairs = 0;
+        for (let i = 0; i < fastStrideLaps.length - 1; i++) {
+          const a = fastStrideLaps[i], b = fastStrideLaps[i + 1];
+          if (b > a + 1) {
+            const between = rawLaps.slice(a + 1, b);
+            const hasRecovery = between.some((l: any) =>
+              l.distance < 50 || l.elapsed_time / (l.distance || 1) > 1.5
+            );
+            if (hasRecovery) separatedPairs++;
+          }
+        }
+        const required = Math.ceil((fastStrideLaps.length - 1) * 0.5);
+        if (separatedPairs >= required) {
+          return { distance: 100, count: fastStrideLaps.length };
+        }
+      }
+    }
+  }
+
   // --- Ladder detection ---
   // Identify fast (work) laps by pace, then check if they form an
   // ascending or descending sequence of different valid distances.
@@ -224,9 +265,9 @@ export function inferDistanceFromLaps(
     if (match) fastLaps.push({ index: i, distance: match });
   });
 
-  if (fastLaps.length >= 2) {
+  if (fastLaps.length >= 3) {
     const uniqueDists = new Set(fastLaps.map(m => m.distance));
-    if (uniqueDists.size >= 2) {
+    if (uniqueDists.size >= 3) {
       const distances = fastLaps.map(m => m.distance);
       const isAscending = distances.every((d, i) => i === 0 || d >= distances[i - 1]);
       const isDescending = distances.every((d, i) => i === 0 || d <= distances[i - 1]);

@@ -244,6 +244,80 @@ describe("parseDescriptionForIntervals - ladder patterns", () => {
   });
 });
 
+// --- New: asterisk separator and reversed pattern ---
+
+describe("parseDescriptionForIntervals - asterisk and reversed patterns", () => {
+  it("parses '4*100m strides' (asterisk separator)", () => {
+    expect(parseDescriptionForIntervals("Warmup + 4*100m strides", null))
+      .toEqual({ distance: 100, count: 4 });
+  });
+
+  it("parses '400m x 5' (reversed pattern)", () => {
+    expect(parseDescriptionForIntervals("400m x 5", null))
+      .toEqual({ distance: 400, count: 5 });
+  });
+
+  it("parses '800m * 3' (reversed with asterisk)", () => {
+    expect(parseDescriptionForIntervals("800m * 3", null))
+      .toEqual({ distance: 800, count: 3 });
+  });
+
+  it("parses '5*400m' (normal with asterisk)", () => {
+    expect(parseDescriptionForIntervals("5*400m", null))
+      .toEqual({ distance: 400, count: 5 });
+  });
+});
+
+// --- 100m stride detection ---
+
+describe("inferDistanceFromLaps - 100m strides", () => {
+  // Helper to build a stride lap set: strideCount fast 100m laps,
+  // each followed by a tiny 20m standing pause.
+  function makeStrideLaps(strideCount: number, warmupLaps: Array<{ distance: number; elapsed_time: number }> = []) {
+    const laps: Array<{ distance: number; elapsed_time: number }> = [...warmupLaps];
+    for (let i = 0; i < strideCount; i++) {
+      laps.push({ distance: 100, elapsed_time: 26 }); // fast stride ~0.26 sec/m
+      if (i < strideCount - 1) {
+        laps.push({ distance: 20, elapsed_time: 29 }); // standing pause (GPS artifact)
+      }
+    }
+    return laps;
+  }
+
+  it("detects 4x100m strides after a warmup lap", () => {
+    const laps = makeStrideLaps(4, [{ distance: 1000, elapsed_time: 430 }]);
+    const result = inferDistanceFromLaps(laps);
+    expect(result).toEqual({ distance: 100, count: 4 });
+  });
+
+  it("detects 3x100m strides with no warmup", () => {
+    const laps = makeStrideLaps(3);
+    const result = inferDistanceFromLaps(laps);
+    expect(result).toEqual({ distance: 100, count: 3 });
+  });
+
+  it("does NOT detect strides when long laps heavily outnumber 100m laps (tempo run GPS artifacts)", () => {
+    // Simulate a tempo run: 10x1000m tempo laps with 3 fast 100m GPS artifact laps in between
+    const laps: Array<{ distance: number; elapsed_time: number }> = [];
+    // 3 slow 1000m warmup
+    for (let i = 0; i < 3; i++) laps.push({ distance: 1000, elapsed_time: 420 });
+    // GPS transition artifacts: 1 slow 100m + 3 fast 100m
+    laps.push({ distance: 100, elapsed_time: 71 }); // slow
+    laps.push({ distance: 20, elapsed_time: 29 });
+    laps.push({ distance: 100, elapsed_time: 27 }); // fast
+    laps.push({ distance: 20, elapsed_time: 29 });
+    laps.push({ distance: 100, elapsed_time: 26 }); // fast
+    laps.push({ distance: 20, elapsed_time: 29 });
+    laps.push({ distance: 100, elapsed_time: 25 }); // fast
+    // 7 fast 1000m tempo laps
+    for (let i = 0; i < 7; i++) laps.push({ distance: 1000, elapsed_time: 335 });
+    // 1 slow 1000m cooldown
+    laps.push({ distance: 1000, elapsed_time: 450 });
+    // 11 long laps total (>300m), 3 fast 100m strides → strides < longLaps → blocked
+    expect(inferDistanceFromLaps(laps)).toBeNull();
+  });
+});
+
 describe("inferDistanceFromLaps - ladder patterns", () => {
   it("detects ascending ladder 200-400-800 with recovery laps", () => {
     const laps = [

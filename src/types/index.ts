@@ -74,6 +74,7 @@ export interface DashboardData {
 
 // Allowed interval distances in meters
 export const INTERVAL_DISTANCES = {
+  "100m": 100,
   "200m": 200,
   "400m": 400,
   "500m": 500,
