@@ -488,7 +488,7 @@ export function looksLikeIntervalActivity(activity: {
 }): boolean {
   if (activity.workout_type === 3) return true;
   const name = activity.name ?? "";
-  const keywords = /interval|repeat|rep|fartlek|speed\s*work|track|stride/i;
+  const keywords = /interval|repeat|rep|fartlek|speed\s*work|track|stride|tempo/i;
   const pattern  = /\d+\s*[x×*]\s*\d+\s*(?:m|meter|min|k\b)/i;
   return keywords.test(name) || pattern.test(name);
 }
