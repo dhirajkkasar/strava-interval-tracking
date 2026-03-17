@@ -184,6 +184,14 @@ export function inferDistanceFromLaps(
         return { distance: Number(val), count: workIndices.size };
       }
     }
+    // If all matched laps cover a consistent distance (within 20%), this is
+    // almost certainly a distance-based interval whose time happens to fall
+    // near a time-bucket boundary. Skip it and let distance detection handle it.
+    const matchedDists = [...indices].map((i) => laps[i].distance);
+    const distMin = Math.min(...matchedDists);
+    const distMax = Math.max(...matchedDists);
+    if (distMax < distMin * 1.2) continue;
+
     // Normal case: check for interval pattern
     if (hasIntervalPattern(indices)) {
       return { distance: Number(val), count: indices.size };

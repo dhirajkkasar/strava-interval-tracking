@@ -83,6 +83,7 @@ export const INTERVAL_DISTANCES = {
   "1200m": 1200,
   "1600m": 1600,
   "1 min": -60,
+  "90 sec": -90,
 } as const;
 
 // Helper to check if an interval value is time-based (negative = seconds)
