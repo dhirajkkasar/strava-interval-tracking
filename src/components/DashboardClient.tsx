@@ -50,27 +50,19 @@ export default function DashboardClient() {
     }
   }, []);
 
-  const fetchData = async () => {
-    if (!startDate || !endDate) {
-      setError("Please select both start and end dates");
-      return;
-    }
-
-    // Validate date range (max 6 months)
+  const dateError = (() => {
+    if (!startDate || !endDate) return "Please select both start and end dates";
     const start = new Date(startDate);
     const end = new Date(endDate);
-    const diffTime = end.getTime() - start.getTime();
-    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) return "Invalid date selected";
+    const diffDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
+    if (diffDays < 0) return "Start date must be before end date";
+    if (diffDays > 180) return "Date range cannot exceed 6 months";
+    return null;
+  })();
 
-    if (diffDays > 180) {
-      setError("Date range cannot exceed 6 months");
-      return;
-    }
-
-    if (diffDays < 0) {
-      setError("Start date must be before end date");
-      return;
-    }
+  const fetchData = async () => {
+    if (dateError) return;
 
     setLoading(true);
     setError("");
@@ -171,7 +163,7 @@ export default function DashboardClient() {
             {/* Distance Selector */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Distance
+                Distance or Time
               </label>
               <select
                 value={selectedDistance}
@@ -216,15 +208,21 @@ export default function DashboardClient() {
             <div className="flex items-end gap-2">
               <button
                 onClick={fetchData}
-                disabled={loading}
+                disabled={loading || !!dateError}
                 className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-medium"
               >
-                {loading ? "Loading..." : "Sync Data"}
+                {loading ? "Loading..." : "Load Intervals"}
               </button>
             </div>
           </div>
 
-          {error && (
+          {dateError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              {dateError}
+            </div>
+          )}
+
+          {!dateError && error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
               {error}
             </div>
