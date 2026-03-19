@@ -142,11 +142,17 @@ export default function DashboardClient() {
       }
     : null;
 
-  const chartData = filteredData?.dailyAverages.map((day) => ({
-    date: day.date,
-    time: day.avgTime,
-    pace: timeStringToSeconds(day.avgPace),
-  })) || [];
+  const chartData = filteredData?.dailyAverages.map((day) => {
+    const sessions = day.sessions ?? [];
+    const allBestPaces = sessions.map(s => s.bestLap?.pace).filter(Boolean).map(p => timeStringToSeconds(p!));
+    const allWorstPaces = sessions.map(s => s.worstLap?.pace).filter(Boolean).map(p => timeStringToSeconds(p!));
+    return {
+      date: day.date,
+      avgPace: timeStringToSeconds(day.avgPace),
+      bestPace: allBestPaces.length ? Math.min(...allBestPaces) : undefined,
+      worstPace: allWorstPaces.length ? Math.max(...allWorstPaces) : undefined,
+    };
+  }) || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
@@ -252,37 +258,29 @@ export default function DashboardClient() {
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
-                  <YAxis yAxisId="left" label={{ value: "Time (seconds)", angle: -90, position: "insideLeft" }} />
-                  <YAxis yAxisId="right" orientation="right" label={{ value: "Pace (min/km)", angle: 90, position: "insideRight" }} />
-                  <Tooltip 
-                    formatter={(value: unknown, name?: string): string => {
+                  <YAxis
+                    domain={[180, 420]}
+                    ticks={[180, 210, 240, 270, 300, 330, 360, 390, 420]}
+                    tickFormatter={(v: number) => {
+                      const m = Math.floor(v / 60);
+                      const s = v % 60;
+                      return `${m}:${s.toString().padStart(2, "0")}`;
+                    }}
+                    label={{ value: "Pace (min/km)", angle: -90, position: "insideLeft", offset: 10 }}
+                    reversed
+                  />
+                  <Tooltip
+                    formatter={(value: unknown): string => {
                       const val = value as number;
-                      if (name === "Avg Time (sec)") return `${val} sec`;
-                      if (name === "Pace (min/km)") {
-                        const mins = Math.floor(val / 60);
-                        const secs = Math.round(val % 60);
-                        return `${mins}:${secs.toString().padStart(2, "0")}`;
-                      }
-                      return String(value);
+                      const m = Math.floor(val / 60);
+                      const s = Math.round(val % 60);
+                      return `${m}:${s.toString().padStart(2, "0")} /km`;
                     }}
                   />
                   <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="time"
-                    stroke="#3b82f6"
-                    yAxisId="left"
-                    name="Avg Time (sec)"
-                    connectNulls
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="pace"
-                    stroke="#ef4444"
-                    yAxisId="right"
-                    name="Pace (min/km)"
-                    connectNulls
-                  />
+                  <Line type="monotone" dataKey="bestPace"  stroke="#22c55e" name="Best Pace"  dot={false} connectNulls />
+                  <Line type="monotone" dataKey="avgPace"   stroke="#3b82f6" name="Avg Pace"   dot={false} connectNulls />
+                  <Line type="monotone" dataKey="worstPace" stroke="#ef4444" name="Worst Pace" dot={false} connectNulls />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -299,33 +297,55 @@ export default function DashboardClient() {
                       <th className="px-4 py-3 text-left font-semibold text-gray-700">
                         Date
                       </th>
-                      {isTimeBasedInterval(selectedDistance) && (
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700">
-                          Avg Distance
-                        </th>
-                      )}
                       <th className="px-4 py-3 text-left font-semibold text-gray-700">
-                        Avg Time
+                        Avg
                       </th>
                       <th className="px-4 py-3 text-left font-semibold text-gray-700">
-                        Avg Pace
+                        Best Lap
+                      </th>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                        Worst Lap
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredData.dailyAverages.map((day, idx) => (
-                      <tr
-                        key={idx}
-                        className="border-b border-gray-100 hover:bg-blue-50 transition"
-                      >
-                        <td className="px-4 py-3 text-gray-800">{day.date}</td>
-                        {isTimeBasedInterval(selectedDistance) && (
-                          <td className="px-4 py-3 text-gray-800">{day.avgDistance}m</td>
-                        )}
-                        <td className="px-4 py-3 text-gray-800">{day.avgTime}s</td>
-                        <td className="px-4 py-3 text-gray-800">{day.avgPace}</td>
-                      </tr>
-                    ))}
+                    {filteredData.dailyAverages.map((day, idx) => {
+                      const isTimeBased = isTimeBasedInterval(selectedDistance);
+                      const sessions = day.sessions ?? [];
+                      // Collect individual best/worst laps from all sessions that day
+                      const allBest = sessions.map(s => s.bestLap).filter(Boolean);
+                      const allWorst = sessions.map(s => s.worstLap).filter(Boolean);
+                      const dayBest = isTimeBased
+                        ? allBest.reduce<typeof allBest[0]>((a, b) => (b!.distance > (a?.distance ?? -Infinity) ? b : a), allBest[0])
+                        : allBest.reduce<typeof allBest[0]>((a, b) => (b!.time < (a?.time ?? Infinity) ? b : a), allBest[0]);
+                      const dayWorst = isTimeBased
+                        ? allWorst.reduce<typeof allWorst[0]>((a, b) => (b!.distance < (a?.distance ?? Infinity) ? b : a), allWorst[0])
+                        : allWorst.reduce<typeof allWorst[0]>((a, b) => (b!.time > (a?.time ?? -Infinity) ? b : a), allWorst[0]);
+                      const fmtAvg = isTimeBased
+                        ? `${day.avgDistance ?? "?"}m / ${day.avgPace}`
+                        : `${day.avgTime}s / ${day.avgPace}`;
+                      const fmtBest = dayBest
+                        ? isTimeBased
+                          ? `${dayBest.distance}m / ${dayBest.pace}`
+                          : `${dayBest.time}s / ${dayBest.pace}`
+                        : "—";
+                      const fmtWorst = dayWorst
+                        ? isTimeBased
+                          ? `${dayWorst.distance}m / ${dayWorst.pace}`
+                          : `${dayWorst.time}s / ${dayWorst.pace}`
+                        : "—";
+                      return (
+                        <tr
+                          key={idx}
+                          className="border-b border-gray-100 hover:bg-blue-50 transition"
+                        >
+                          <td className="px-4 py-3 text-gray-800">{day.date}</td>
+                          <td className="px-4 py-3 text-gray-800">{fmtAvg}</td>
+                          <td className="px-4 py-3 text-green-700 font-medium">{fmtBest}</td>
+                          <td className="px-4 py-3 text-red-600 font-medium">{fmtWorst}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

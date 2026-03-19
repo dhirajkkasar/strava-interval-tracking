@@ -220,6 +220,70 @@ describe("parseIntervalSession", () => {
   });
 });
 
+// --- parseIntervalSession - bestLap and worstLap ---
+
+describe("parseIntervalSession - bestLap and worstLap", () => {
+  // makeActivity() has 3 × 400m laps with moving_times 85, 87, 83 (and 200m recovery laps)
+
+  it("bestLap is the rep with lowest moving_time for distance-based intervals", () => {
+    const [r] = parseIntervalSession(makeActivity());
+    expect(r.bestLap).toEqual({ time: 83, pace: calculatePace(400, 83), distance: 400 });
+  });
+
+  it("worstLap is the rep with highest moving_time for distance-based intervals", () => {
+    const [r] = parseIntervalSession(makeActivity());
+    expect(r.worstLap).toEqual({ time: 87, pace: calculatePace(400, 87), distance: 400 });
+  });
+
+  it("bestLap equals worstLap when there is only one rep", () => {
+    const activity = makeActivity({
+      laps: [
+        { id: 1, name: "Lap 1", elapsed_time: 88, distance: 400, moving_time: 85, start_index: 0, end_index: 1, lap_index: 1 },
+        { id: 2, name: "Lap 2", elapsed_time: 200, distance: 200, moving_time: 190, start_index: 1, end_index: 2, lap_index: 2 },
+        { id: 3, name: "Lap 3", elapsed_time: 90, distance: 400, moving_time: 87, start_index: 2, end_index: 3, lap_index: 3 },
+        { id: 4, name: "Lap 4", elapsed_time: 195, distance: 200, moving_time: 185, start_index: 3, end_index: 4, lap_index: 4 },
+        // Only 2 matching 400m laps — need ≥3 for hasIntervalPattern; use description hint
+        { id: 5, name: "Lap 5", elapsed_time: 86, distance: 400, moving_time: 83, start_index: 4, end_index: 5, lap_index: 5 },
+      ],
+      name: "1x400m test",
+      description: "1 * 400m",
+    });
+    // With hint count=1, only the fastest lap is selected
+    const [r] = parseIntervalSession(activity);
+    expect(r.count).toBe(1);
+    expect(r.bestLap).toEqual(r.worstLap);
+  });
+
+  const oneMinActivity: DetailedActivity = {
+    id: 50,
+    name: "3 x 1min intervals",
+    description: null,
+    distance: 800,
+    moving_time: 330,
+    elapsed_time: 420,
+    start_date: "2024-08-01T07:00:00Z",
+    type: "Run",
+    sport_type: "Run",
+    laps: [
+      { id: 1, name: "Lap 1", elapsed_time: 60, distance: 210, moving_time: 60, start_index: 0, end_index: 1, lap_index: 1 },
+      { id: 2, name: "Lap 2", elapsed_time: 75, distance: 150, moving_time: 75, start_index: 1, end_index: 2, lap_index: 2 },
+      { id: 3, name: "Lap 3", elapsed_time: 60, distance: 200, moving_time: 60, start_index: 2, end_index: 3, lap_index: 3 },
+      { id: 4, name: "Lap 4", elapsed_time: 75, distance: 145, moving_time: 75, start_index: 3, end_index: 4, lap_index: 4 },
+      { id: 5, name: "Lap 5", elapsed_time: 60, distance: 190, moving_time: 60, start_index: 4, end_index: 5, lap_index: 5 },
+    ],
+  };
+
+  it("bestLap is the rep with most distance covered for time-based intervals", () => {
+    const [r] = parseIntervalSession(oneMinActivity);
+    expect(r.bestLap).toEqual({ distance: 210, time: 60, pace: calculatePace(210, 60) });
+  });
+
+  it("worstLap is the rep with least distance covered for time-based intervals", () => {
+    const [r] = parseIntervalSession(oneMinActivity);
+    expect(r.worstLap).toEqual({ distance: 190, time: 60, pace: calculatePace(190, 60) });
+  });
+});
+
 // --- extractDescriptionHints - ladder patterns ---
 
 describe("extractDescriptionHints - ladder patterns", () => {

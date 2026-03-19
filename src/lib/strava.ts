@@ -436,6 +436,7 @@ export function parseIntervalSession(
     let totalIntervalTime = 0;
     let intervalCount = 0;
     let totalIntervalDistance = 0;
+    let workLaps: typeof activity.laps = [];
 
     if (isTimeBasedInterval(d.distance)) {
       // Time-based: match laps by elapsed_time.
@@ -446,6 +447,7 @@ export function parseIntervalSession(
         .filter(lap => Math.abs(lap.elapsed_time - targetSeconds) < targetSeconds * 0.15)
         .sort((a, b) => b.distance - a.distance)
         .slice(0, d.count);
+      workLaps = matchingLaps;
       for (const lap of matchingLaps) {
         totalIntervalTime += lap.elapsed_time;
         totalIntervalDistance += lap.distance;
@@ -459,6 +461,7 @@ export function parseIntervalSession(
         .filter(lap => Math.abs(lap.distance - d.distance) < d.distance * 0.15)
         .sort((a, b) => (a.moving_time / (a.distance || 1)) - (b.moving_time / (b.distance || 1)))
         .slice(0, d.count);
+      workLaps = matchingLaps;
       for (const lap of matchingLaps) {
         totalIntervalTime += lap.moving_time;
         intervalCount++;
@@ -472,6 +475,32 @@ export function parseIntervalSession(
       ? calculatePace(totalIntervalDistance / intervalCount, avgTime)
       : calculatePace(d.distance, avgTime);
 
+    // Best/worst individual rep from the matched work laps
+    let bestLap, worstLap;
+    if (workLaps && workLaps.length > 0) {
+      if (isTimeBasedInterval(d.distance)) {
+        // Time-based: best = most distance covered in the fixed duration
+        const byDist = [...workLaps].sort((a, b) => b.distance - a.distance);
+        const mkStat = (lap: typeof workLaps[0]) => ({
+          time: lap.elapsed_time,
+          pace: calculatePace(lap.distance, lap.elapsed_time),
+          distance: Math.round(lap.distance),
+        });
+        bestLap = mkStat(byDist[0]);
+        worstLap = mkStat(byDist[byDist.length - 1]);
+      } else {
+        // Distance-based: best = fastest (lowest moving_time)
+        const byTime = [...workLaps].sort((a, b) => a.moving_time - b.moving_time);
+        const mkStat = (lap: typeof workLaps[0]) => ({
+          time: lap.moving_time,
+          pace: calculatePace(d.distance, lap.moving_time),
+          distance: Math.round(lap.distance),
+        });
+        bestLap = mkStat(byTime[0]);
+        worstLap = mkStat(byTime[byTime.length - 1]);
+      }
+    }
+
     output.push({
       sessionId: id,
       sessionDate,
@@ -483,6 +512,8 @@ export function parseIntervalSession(
       ...(isTimeBasedInterval(d.distance) && {
         avgCoveredDistance: Math.round(totalIntervalDistance / intervalCount),
       }),
+      bestLap,
+      worstLap,
       detected_by: "lap",
     });
   }

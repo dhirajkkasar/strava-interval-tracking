@@ -44,6 +44,13 @@ export interface Split {
   split: number;
 }
 
+// A single representative lap (best or worst rep in a session)
+export interface LapStat {
+  time: number;     // seconds: moving_time (distance-based) or elapsed_time (time-based)
+  pace: string;     // min/km
+  distance: number; // meters covered by this lap
+}
+
 // Parsed interval session
 export interface ParsedInterval {
   sessionId: number;
@@ -54,6 +61,8 @@ export interface ParsedInterval {
   avgTime: number; // seconds
   avgPace: string; // min/km
   avgCoveredDistance?: number; // meters - actual distance covered (for time-based intervals)
+  bestLap?: LapStat; // fastest rep (min time for dist-based, max distance for time-based)
+  worstLap?: LapStat; // slowest rep (max time for dist-based, min distance for time-based)
   detected_by: "description" | "lap" | "segment" | "unknown";
 }
 
