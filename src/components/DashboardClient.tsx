@@ -44,7 +44,6 @@ export default function DashboardClient() {
       try {
         const parsed = JSON.parse(cached);
         setData(parsed);
-        setIsSynced(true);
       } catch (e) {
         console.error("Failed to parse cached data:", e);
       }
@@ -288,10 +287,10 @@ export default function DashboardClient() {
               </ResponsiveContainer>
             </div>
 
-            {/* Daily Averages Table */}
+            {/* Interval History Table */}
             <div className="bg-white rounded-lg shadow-lg p-6">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                Daily Averages - {selectedLabel}
+                {selectedLabel} Interval History
               </h2>
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -299,9 +298,6 @@ export default function DashboardClient() {
                     <tr className="border-b-2 border-gray-200">
                       <th className="px-4 py-3 text-left font-semibold text-gray-700">
                         Date
-                      </th>
-                      <th className="px-4 py-3 text-left font-semibold text-gray-700">
-                        Sessions
                       </th>
                       {isTimeBasedInterval(selectedDistance) && (
                         <th className="px-4 py-3 text-left font-semibold text-gray-700">
@@ -323,7 +319,6 @@ export default function DashboardClient() {
                         className="border-b border-gray-100 hover:bg-blue-50 transition"
                       >
                         <td className="px-4 py-3 text-gray-800">{day.date}</td>
-                        <td className="px-4 py-3 text-gray-800">{day.sessions.length}</td>
                         {isTimeBasedInterval(selectedDistance) && (
                           <td className="px-4 py-3 text-gray-800">{day.avgDistance}m</td>
                         )}

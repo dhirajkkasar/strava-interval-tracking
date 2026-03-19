@@ -50,6 +50,7 @@ export interface ParsedInterval {
   sessionDate: string;
   activityName: string;
   distance: number; // meters (or negative for time-based interval key)
+  count: number; // number of interval reps detected
   avgTime: number; // seconds
   avgPace: string; // min/km
   avgCoveredDistance?: number; // meters - actual distance covered (for time-based intervals)
@@ -78,6 +79,7 @@ export const INTERVAL_DISTANCES = {
   "200m": 200,
   "400m": 400,
   "500m": 500,
+  "600m": 600,
   "800m": 800,
   "1k": 1000,
   "1200m": 1200,

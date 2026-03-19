@@ -6,7 +6,7 @@
 
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import { parseDescriptionForIntervals, parseIntervalSession } from "../src/lib/strava";
+import { extractDescriptionHints, parseIntervalSession } from "../src/lib/strava";
 import type { DetailedActivity } from "../src/types";
 
 // Load .env files
@@ -104,7 +104,7 @@ async function main() {
       continue;
     }
 
-    const descResult = parseDescriptionForIntervals(detailed.name, detailed.description);
+    const descResult = extractDescriptionHints(detailed.name, detailed.description);
     const sessionResult = parseIntervalSession(detailed);
     const isDetected = sessionResult !== null;
     if (isDetected) detected++;

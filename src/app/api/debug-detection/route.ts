@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
-import { fetchStravaActivities, fetchDetailedActivity, parseDescriptionForIntervals, parseIntervalSession } from "../../../lib/strava";
+import { fetchStravaActivities, fetchDetailedActivity, extractDescriptionHints, parseIntervalSession } from "../../../lib/strava";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -34,9 +34,9 @@ export async function GET() {
       continue;
     }
 
-    const descResult = parseDescriptionForIntervals(detailed.name, detailed.description);
+    const descResult = extractDescriptionHints(detailed.name, detailed.description);
     const sessionResult = parseIntervalSession(detailed);
-    const isDetected = sessionResult !== null;
+    const isDetected = sessionResult.length > 0;
 
     const entry: any = {
       id: act.id,

@@ -20,8 +20,8 @@ export function extractDescriptionHints(
   const hints = new Set<number>();
 
   for (const text of texts) {
-    // Time-based: "5x1min", "5 x 2 min", "5×1min", "5*1min"
-    const timePattern = /(\d+)\s*[x×*]\s*(\d+)\s*min/gi;
+    // Time-based: "5x1min", "5 x 2 min", "5×1min", "5*1min", "13 * (1min"
+    const timePattern = /(\d+)\s*[x×*]\s*\(?\s*(\d+)\s*min/gi;
     timePattern.lastIndex = 0;
     let match;
     while ((match = timePattern.exec(text)) !== null) {
@@ -46,6 +46,13 @@ export function extractDescriptionHints(
           hints.add(distance);
         }
       }
+    }
+
+    // "1k" shorthand: "2*1k", "5 x 1k", "5*(1k..."
+    const kPattern = /\d+\s*[x×*]\s*\(?\s*1k\b/gi;
+    kPattern.lastIndex = 0;
+    while (kPattern.exec(text) !== null) {
+      hints.add(1000);
     }
 
     // Ladder: "200-400-800m", "200, 400, 800m", "200/400/800m"
@@ -85,6 +92,59 @@ export function extractDescriptionHints(
 }
 
 /**
+ * Extract a distance→count map from description/name.
+ * Used to pick exactly the right number of laps for hinted distances.
+ * e.g. "2*1k + 2*800m" → Map { 1000 → 2, 800 → 2 }
+ */
+export function extractDescriptionHintCounts(
+  name: string | null,
+  description: string | null
+): Map<number, number> {
+  const texts = [name, description].filter(Boolean) as string[];
+  const counts = new Map<number, number>();
+  if (texts.length === 0) return counts;
+
+  const validValues = Object.values(INTERVAL_DISTANCES);
+  const setMax = (dist: number, count: number) => {
+    if (!counts.has(dist) || counts.get(dist)! < count) counts.set(dist, count);
+  };
+
+  for (const text of texts) {
+    // Time-based: "13 * (1min", "5x2min"
+    const timePattern = /(\d+)\s*[x×*]\s*\(?\s*(\d+)\s*min/gi;
+    let match;
+    while ((match = timePattern.exec(text)) !== null) {
+      const dist = -(parseInt(match[2]) * 60);
+      if (validValues.includes(dist as typeof validValues[number])) setMax(dist, parseInt(match[1]));
+    }
+
+    // Distance-based: "5x400m", "2*800m", "12 *(400m..."
+    const distPatterns = [
+      { regex: /(\d+)\s*[x×*]\s*\(?\s*(\d+)\s*(?:m|meter)/gi, reversed: false },
+      { regex: /(\d+)\s*(?:m|meter)\s*[x×*]\s*(\d+)/gi, reversed: true },
+      { regex: /(\d+)\s*repeat\s*(?:of\s+)?(\d+)\s*m/gi, reversed: false },
+    ];
+    for (const { regex, reversed } of distPatterns) {
+      regex.lastIndex = 0;
+      while ((match = regex.exec(text)) !== null) {
+        const count = parseInt(reversed ? match[2] : match[1]);
+        const dist = parseInt(reversed ? match[1] : match[2]);
+        if (validValues.includes(dist as typeof validValues[number])) setMax(dist, count);
+      }
+    }
+
+    // "1k" shorthand: "2*1k", "5 × 1k", "5*(1k..."
+    const kPattern = /(\d+)\s*[x×*]\s*\(?\s*1k\b/gi;
+    kPattern.lastIndex = 0;
+    while ((match = kPattern.exec(text)) !== null) {
+      setMax(1000, parseInt(match[1]));
+    }
+  }
+
+  return counts;
+}
+
+/**
  * Infer interval distances from lap data. Laps are the authoritative source.
  * Accepts optional description hints to guide the search (hinted distances
  * are validated first; un-hinted patterns are also scanned).
@@ -92,7 +152,8 @@ export function extractDescriptionHints(
  */
 export function inferDistanceFromLaps(
   rawLaps: any[],
-  hints?: number[]
+  hints?: number[],
+  hintCounts?: Map<number, number>
 ): DetectedInterval[] {
   if (!rawLaps || rawLaps.length < 3) return [];
 
@@ -109,7 +170,7 @@ export function inferDistanceFromLaps(
    * Verify interval pattern: work laps must be individually separated by
    * recovery laps (not forming one continuous block like a tempo run).
    */
-  function hasIntervalPattern(matchedIndices: Set<number>): boolean {
+  function hasIntervalPattern(matchedIndices: Set<number>, skipSeparation = false): boolean {
     if (matchedIndices.size < 3) return false;
 
     const workIndices = [...matchedIndices].sort((a, b) => a - b);
@@ -121,11 +182,14 @@ export function inferDistanceFromLaps(
 
     // Reject continuous blocks: every consecutive pair of work laps must
     // have at least one non-work lap between them. Count how many do.
-    let separatedPairs = 0;
-    for (let i = 0; i < workIndices.length - 1; i++) {
-      if (workIndices[i + 1] - workIndices[i] > 1) separatedPairs++;
+    // Skip this check for hinted distances — the description is the authority.
+    if (!skipSeparation) {
+      let separatedPairs = 0;
+      for (let i = 0; i < workIndices.length - 1; i++) {
+        if (workIndices[i + 1] - workIndices[i] > 1) separatedPairs++;
+      }
+      if (separatedPairs < (workIndices.length - 1) * 0.75) return false;
     }
-    if (separatedPairs < (workIndices.length - 1) * 0.75) return false;
 
     // For pace comparison, use only meaningful rest laps (≥100m).
     const meaningfulRestIndices = restIndices.filter((i: number) => laps[i].distance >= 100);
@@ -146,7 +210,17 @@ export function inferDistanceFromLaps(
     const match = validValues.find(
       (v) => v < 0 && Math.abs(Math.abs(v) - lap.elapsed_time) < Math.abs(v) * 0.15
     );
-    if (match) {
+    // Don't classify as time-based if the lap is clearly a distance-based interval
+    // (e.g. a 100m stride with elapsed=67s falls within 15% of 60s but it's a stride).
+    // Exception: when the time value is hinted AND the matched standard distance is NOT
+    // itself hinted — i.e., the lap covers an untracked distance (e.g. 1min uphill ~200m
+    // where 200m is not in hints), so the description's time hint should take precedence.
+    const matchingStandardDist = match
+      ? validValues.find((d) => d > 0 && Math.abs(d - lap.distance) < d * 0.08)
+      : undefined;
+    const timeHinted = match && hints?.includes(match);
+    const distanceAlsoHinted = matchingStandardDist && hints?.includes(matchingStandardDist);
+    if (match && (!matchingStandardDist || (timeHinted && !distanceAlsoHinted))) {
       if (!timeBuckets[match]) timeBuckets[match] = new Set();
       timeBuckets[match].add(i);
     }
@@ -174,10 +248,11 @@ export function inferDistanceFromLaps(
 
     // Skip if laps cluster tightly around a standard distance — it's a
     // distance-based interval whose time incidentally falls near this bucket.
+    // Exception: if this time value is explicitly hinted, trust the description.
     const matchedDists = [...indices].map((i) => laps[i].distance);
     const medianDist = [...matchedDists].sort((a, b) => a - b)[Math.floor(matchedDists.length / 2)];
     const coversStandardDist = validValues.some(d => d > 0 && Math.abs(d - medianDist) < d * 0.08);
-    if (coversStandardDist) continue;
+    if (coversStandardDist && !hints?.includes(numVal)) continue;
 
     if (hasIntervalPattern(indices)) {
       results.push({ distance: numVal, count: indices.size });
@@ -195,8 +270,26 @@ export function inferDistanceFromLaps(
     }
   });
 
+  // For hinted distances with a known count from the description, trust the count
+  // directly and take the N fastest matching laps — no pattern check needed.
+  if (hintCounts && hintCounts.size > 0) {
+    const sortedByDist = Object.entries(distBuckets).sort((a, b) => Number(b[0]) - Number(a[0]));
+    for (const [d, indices] of sortedByDist) {
+      const numDist = Number(d);
+      if (seen.has(numDist)) continue;
+      if (!hints?.includes(numDist)) continue;
+      const hintCount = hintCounts.get(numDist);
+      if (!hintCount || indices.size < hintCount) continue;
+      results.push({ distance: numDist, count: hintCount });
+      seen.add(numDist);
+    }
+  }
+
+  // For hinted distances the description explicitly names them as intervals,
+  // so skip the strict separation check — rely on the pace check alone.
   const validDistBuckets = Object.entries(distBuckets)
-    .filter(([, indices]) => hasIntervalPattern(indices));
+    .filter(([d, indices]) => hasIntervalPattern(indices) ||
+      (hints?.includes(Number(d)) && hasIntervalPattern(indices, true)));
 
   // Check hinted distances first, then remaining valid buckets.
   // Larger distances still win when two buckets compete for the same laps
@@ -227,7 +320,7 @@ export function inferDistanceFromLaps(
     for (let i = 0; i < rawLaps.length; i++) {
       const lap = rawLaps[i];
       if (Math.abs(lap.distance - 100) <= 100 * 0.15) {
-        if (lap.elapsed_time / (lap.distance || 1) < STRIDE_PACE_THRESHOLD) {
+        if ((lap.moving_time ?? lap.elapsed_time) / (lap.distance || 1) < STRIDE_PACE_THRESHOLD) {
           fastStrideLaps.push(i);
         }
       }
@@ -320,9 +413,10 @@ export function parseIntervalSession(
 
   // Extract candidate distances from description as hints
   const hints = extractDescriptionHints(name, description);
+  const hintCounts = extractDescriptionHintCounts(name, description);
 
   // Lap inference is the truth — always run, hints guide the search
-  let detected = inferDistanceFromLaps(activity.laps, hints);
+  let detected = inferDistanceFromLaps(activity.laps, hints, hintCounts);
 
   // For tempo runs, only keep:
   //   • 100m strides (always valid)
@@ -363,10 +457,10 @@ export function parseIntervalSession(
       // This excludes same-distance recovery laps (e.g. 200m jogs in a ladder).
       const matchingLaps = activity.laps!
         .filter(lap => Math.abs(lap.distance - d.distance) < d.distance * 0.15)
-        .sort((a, b) => (a.elapsed_time / (a.distance || 1)) - (b.elapsed_time / (b.distance || 1)))
+        .sort((a, b) => (a.moving_time / (a.distance || 1)) - (b.moving_time / (b.distance || 1)))
         .slice(0, d.count);
       for (const lap of matchingLaps) {
-        totalIntervalTime += lap.elapsed_time;
+        totalIntervalTime += lap.moving_time;
         intervalCount++;
       }
     }
@@ -383,6 +477,7 @@ export function parseIntervalSession(
       sessionDate,
       activityName: name,
       distance: d.distance,
+      count: intervalCount,
       avgTime,
       avgPace,
       ...(isTimeBasedInterval(d.distance) && {

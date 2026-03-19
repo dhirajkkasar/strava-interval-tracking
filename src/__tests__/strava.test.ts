@@ -48,6 +48,10 @@ describe("extractDescriptionHints", () => {
     );
   });
 
+  it("extracts 600m intervals", () => {
+    expect(extractDescriptionHints("5x600m", null)).toEqual([600]);
+  });
+
   it("extracts asterisk separator", () => {
     expect(extractDescriptionHints("5*400m", null)).toEqual([400]);
   });
@@ -86,6 +90,17 @@ describe("inferDistanceFromLaps", () => {
       { distance: 400, elapsed_time: 84 },
     ];
     expect(inferDistanceFromLaps(laps)).toEqual([{ distance: 400, count: 3 }]);
+  });
+
+  it("detects 600m intervals with recovery", () => {
+    const laps = [
+      { distance: 600, elapsed_time: 130 },
+      { distance: 200, elapsed_time: 90 },
+      { distance: 600, elapsed_time: 133 },
+      { distance: 200, elapsed_time: 88 },
+      { distance: 600, elapsed_time: 131 },
+    ];
+    expect(inferDistanceFromLaps(laps)).toEqual([{ distance: 600, count: 3 }]);
   });
 
   it("detects 800m intervals with recovery", () => {
@@ -165,8 +180,8 @@ describe("parseIntervalSession", () => {
     expect(result[0].distance).toBe(400);
     expect(result[0].detected_by).toBe("lap");
     expect(result[0].sessionDate).toBe("2024-06-15");
-    expect(result[0].avgTime).toBe(88); // avg of 88, 90, 86
-    expect(result[0].avgPace).toBe(calculatePace(400, 88));
+    expect(result[0].avgTime).toBe(85); // avg moving_time of 85, 87, 83
+    expect(result[0].avgPace).toBe(calculatePace(400, 85));
   });
 
   it("detects intervals even when description has no pattern (lap inference)", () => {
@@ -465,9 +480,9 @@ describe("parseIntervalSession - ladder workouts", () => {
     const r200 = result.find(r => r.distance === 200)!;
     const r400 = result.find(r => r.distance === 400)!;
     const r800 = result.find(r => r.distance === 800)!;
-    expect(r200.avgTime).toBe(38);   // fastest 200m lap, not the 120s recovery ones
-    expect(r400.avgTime).toBe(80);
-    expect(r800.avgTime).toBe(170);
+    expect(r200.avgTime).toBe(36);   // fastest 200m lap by moving_time
+    expect(r400.avgTime).toBe(78);
+    expect(r800.avgTime).toBe(165);
     expect(result.every(i => i.sessionId === 100)).toBe(true);
     expect(result.every(i => i.sessionDate === "2024-07-01")).toBe(true);
     expect(result.every(i => i.detected_by === "lap")).toBe(true);
@@ -478,6 +493,137 @@ describe("parseIntervalSession - ladder workouts", () => {
     expect(result).toHaveLength(1);
     expect(result[0].distance).toBe(400);
   });
+});
+
+// --- Real-data fixtures from docs/filtered.json ---
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const filteredActivities = require("../../docs/filtered.json") as Array<{
+  id: number;
+  name: string;
+  description: string;
+  start_date_local: string;
+  valid: string[] | false;
+  laps: Array<{ lap_index: number; distance: number; elapsed_time: number; moving_time: number }>;
+}>;
+
+function makeRealActivity(
+  id: number,
+  name: string,
+  description: string | null,
+  startDateLocal: string,
+  laps: Array<{ lap_index: number; distance: number; elapsed_time: number; moving_time: number }>
+): DetailedActivity {
+  return {
+    id, name, description,
+    distance: laps.reduce((s, l) => s + l.distance, 0),
+    moving_time: laps.reduce((s, l) => s + l.moving_time, 0),
+    elapsed_time: laps.reduce((s, l) => s + l.elapsed_time, 0),
+    start_date: startDateLocal,
+    start_date_local: startDateLocal,
+    type: "Run", sport_type: "Run",
+    laps: laps.map((l, i) => ({
+      id: i, name: `Lap ${l.lap_index}`,
+      elapsed_time: l.elapsed_time, distance: l.distance, moving_time: l.moving_time,
+      start_index: i, end_index: i + 1, lap_index: l.lap_index,
+    })),
+  };
+}
+
+describe("real-data NEGATIVE: should return []", () => {
+  const negatives = filteredActivities.filter(a => a.valid === false);
+
+  it.each(negatives.map(a => [a.name, a] as [string, (typeof negatives)[0]]))(
+    "%s (id: %s)",
+    (_, a) => {
+      const result = parseIntervalSession(
+        makeRealActivity(a.id, a.name, a.description || null, a.start_date_local, a.laps)
+      );
+      expect(result).toEqual([]);
+    }
+  );
+});
+
+// Parse a valid label like "4 laps of 100m with 30 sec rest" or
+// "10 intervals of 90sec run + 90sec rest" or "14 intervals of 1min run + 75sec rest"
+// Also handles "2 laps of 1k ..." and "13 laps of 1 min ..."
+function parseValidLabel(label: string): { distance: number; count: number } | null {
+  let m = label.match(/^(\d+) laps of (\d+)m/);
+  if (m) return { count: parseInt(m[1]), distance: parseInt(m[2]) };
+
+  m = label.match(/^(\d+) laps of 1k/);
+  if (m) return { count: parseInt(m[1]), distance: 1000 };
+
+  m = label.match(/^(\d+) laps of (\d+) min/);
+  if (m) return { count: parseInt(m[1]), distance: -parseInt(m[2]) * 60 };
+
+  m = label.match(/^(\d+) intervals of (\d+)sec/);
+  if (m) return { count: parseInt(m[1]), distance: -parseInt(m[2]) };
+
+  m = label.match(/^(\d+) intervals of (\d+)min/);
+  if (m) return { count: parseInt(m[1]), distance: -parseInt(m[2]) * 60 };
+
+  return null;
+}
+
+describe("real-data POSITIVE: should detect intervals", () => {
+  const positives = filteredActivities.filter(a => Array.isArray(a.valid));
+
+  it.each(positives.map(a => [a.name, a] as [string, (typeof positives)[0]]))(
+    "%s (id: %s)",
+    (_, a) => {
+      const result = parseIntervalSession(
+        makeRealActivity(a.id, a.name, a.description || null, a.start_date_local, a.laps)
+      );
+      expect(result.length).toBeGreaterThan(0);
+
+      for (const label of a.valid as string[]) {
+        const expected = parseValidLabel(label);
+        if (!expected) continue;
+
+        const match = result.find(r => r.distance === expected.distance);
+        expect({ label, detectedDistances: result.map(r => r.distance), match }).toMatchObject({
+          match: expect.objectContaining({ distance: expected.distance, count: expected.count }),
+        });
+      }
+    }
+  );
+});
+
+// --- Additional real-data fixtures from docs/additionalActivities.json ---
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const additionalActivities = require("../../docs/additionalActivities.json") as Array<{
+  id: number;
+  name: string;
+  description: string;
+  start_date_local: string;
+  valid: string[] | false;
+  laps: Array<{ lap_index: number; distance: number; elapsed_time: number; moving_time: number }>;
+}>;
+
+describe("additional real-data POSITIVE: should detect intervals", () => {
+  const positives = additionalActivities.filter(a => Array.isArray(a.valid));
+
+  it.each(positives.map(a => [a.name, a] as [string, (typeof positives)[0]]))(
+    "%s (id: %s)",
+    (_, a) => {
+      const result = parseIntervalSession(
+        makeRealActivity(a.id, a.name, a.description || null, a.start_date_local, a.laps)
+      );
+      expect(result.length).toBeGreaterThan(0);
+
+      for (const label of a.valid as string[]) {
+        const expected = parseValidLabel(label);
+        if (!expected) continue;
+
+        const match = result.find(r => r.distance === expected.distance);
+        expect({ label, detectedDistances: result.map(r => r.distance), match }).toMatchObject({
+          match: expect.objectContaining({ distance: expected.distance, count: expected.count }),
+        });
+      }
+    }
+  );
 });
 
 // --- Multi-distance activity ---
@@ -523,8 +669,8 @@ describe("parseIntervalSession - multi-distance activity", () => {
     const r400 = result.find(r => r.distance === 400)!;
     const r100 = result.find(r => r.distance === 100)!;
 
-    expect(r400.avgTime).toBe(85); // avg of 85, 87, 84 = 85.3 → 85
-    expect(r100.avgTime).toBe(26); // avg of 26, 25, 26, 27 = 26
+    expect(r400.avgTime).toBe(83); // avg moving_time of 83, 85, 82 = 83.3 → 83
+    expect(r100.avgTime).toBe(25); // avg moving_time of 25, 24, 25, 26 = 25
     expect(result.every(r => r.detected_by === "lap")).toBe(true);
     expect(result.every(r => r.sessionDate === "2026-01-06")).toBe(true);
   });
